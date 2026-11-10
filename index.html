@@ -11,8 +11,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#2dd4bf">
 
-    <!-- Web App Manifest (Inline Base64 JSON for Single File Portability & TWA APK packaging) -->
-    <link rel="manifest" href="data:application/json;base64,ewogICAgIm5hbWUiOiAiTXlPd25MaWJyYXJ5IiwKICAgICJzaG9ydF9uYW1lIjogIk15T3duTGliIiwKICAgICJzdGFydF91cmwiOiAiLiIsCiAgICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAgICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNlZWZjZmQiLAogICAgInRoZW1lX2NvbG9yIjogIiMyZGQ0YmYiLAogICAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAgICJpY29ucyI6IFsKICAgICAgICB7CiAgICAgICAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG4tY29ucy1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi8zNTMxLzM1MzE1NDAucG5nIiwKICAgICAgICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAgICAgICAidHlwZSI6ICJpbWFnZS9wbmciLAogICAgICAgICAgICAicHVycG9zZSI6ICJhbnkgbWFza2FibGUiCiAgICAgICAgfQogICAgXQp9">
+    <!-- Linking real external manifest.json for Android WebAPK compatibility -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3531/3531540.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3531/3531540.png">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -866,11 +868,31 @@
 
         // Initialize App
         window.onload = function() {
+            registerServiceWorker();
             loadBooksFromStorage();
             updateHeaderModelBadge();
             renderApp();
             scheduleNemoDialogue();
         };
+
+        // Service Worker registration with fallback
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js', { scope: './' })
+                    .then((reg) => console.log('PWA Service Worker registered:', reg.scope))
+                    .catch((err) => {
+                        console.warn('Dedicated sw.js not found, generating inline fallback worker:', err);
+                        // Fallback inline worker
+                        const swCode = `
+                            self.addEventListener('install', e => self.skipWaiting());
+                            self.addEventListener('activate', e => self.clients.claim());
+                            self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+                        `;
+                        const blob = new Blob([swCode], { type: 'application/javascript' });
+                        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+                    });
+            }
+        }
 
         function updateHeaderModelBadge() {
             const badge = document.getElementById("header-model-badge");
@@ -884,7 +906,6 @@
         // Load data safely
         function loadBooksFromStorage() {
             try {
-                // Support automatic migration from legacy key if found
                 let raw = localStorage.getItem('myown_library_books');
                 if (!raw) {
                     const legacy = localStorage.getItem('deetya_library_books');
@@ -897,7 +918,6 @@
                 if (raw) {
                     state.books = JSON.parse(raw);
                 } else {
-                    // Seed initial child books
                     state.books = [
                         {
                             id: 'book1',
