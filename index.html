@@ -1664,7 +1664,7 @@
 
             statusMsg.innerText = `Nemo is extracting spine text with ${selectedModel}...`;
 
-            const systemPrompt = `You are a fast OCR librarian. Extract the title and author of every book visible in the photo. Keep responses minimal to save tokens.`;
+            const systemPrompt = `You are a fast OCR librarian. Extract the title and author of every book visible in the photo. Keep responses minimal to save tokens. Output raw JSON only.`;
 
             const promptText = `Find every visible book in this image stack. For each book, extract:
             - title
@@ -1691,6 +1691,9 @@
                 },
                 generationConfig: {
                     responseMimeType: "application/json",
+                    thinkingConfig: {
+                        thinkingLevel: "low"
+                    },
                     responseSchema: {
                         type: "ARRAY",
                         items: {
@@ -1712,10 +1715,10 @@
             const abortController = new AbortController();
             const timeoutId = setTimeout(() => abortController.abort(), 45000);
 
-            // Models to attempt: primary selected model, followed by reliable fallbacks if 404 occurs
+            // Models to attempt: primary selected model, followed by reliable fallbacks if 404/400 occurs
             const modelsToTry = [selectedModel];
-            if (selectedModel !== 'gemini-2.5-flash') modelsToTry.push('gemini-2.5-flash');
             if (selectedModel !== 'gemini-3.5-flash-lite') modelsToTry.push('gemini-3.5-flash-lite');
+            if (selectedModel !== 'gemini-2.5-flash') modelsToTry.push('gemini-2.5-flash');
 
             let lastError = null;
 
@@ -1736,8 +1739,7 @@
                             errMsg = errData?.error?.message || errMsg;
                         } catch(_) {}
 
-                        // If model returned 404 (Not Found), try next fallback model
-                        if (response.status === 404) {
+                        if (response.status === 404 || response.status === 400) {
                             lastError = new Error(errMsg);
                             continue;
                         }
@@ -1747,7 +1749,18 @@
                     const result = await response.json();
                     clearTimeout(timeoutId);
 
-                    const jsonText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    // Extract content from non-thought parts
+                    let jsonText = null;
+                    const parts = result?.candidates?.[0]?.content?.parts || [];
+                    for (const p of parts) {
+                        if (p.text && !p.thought) {
+                            jsonText = p.text;
+                        }
+                    }
+                    if (!jsonText && parts.length > 0) {
+                        jsonText = parts[parts.length - 1].text;
+                    }
+
                     if (jsonText) {
                         const rawBooks = JSON.parse(jsonText);
                         statusMsg.innerText = "Fetching official metadata & covers from Google Books API...";
