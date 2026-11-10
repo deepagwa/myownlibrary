@@ -866,6 +866,47 @@
             });
         }
 
+        // Fast high-definition image compressor optimized for Gemini Vision API payload
+        function prepareImageForGemini(dataUrl, maxDim = 1280) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) {
+                            h = Math.round((h * maxDim) / w);
+                            w = maxDim;
+                        } else {
+                            w = Math.round((w * maxDim) / h);
+                            h = maxDim;
+                        }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const mime = 'image/jpeg';
+                    const compressedDataUrl = canvas.toDataURL(mime, 0.82);
+                    resolve({
+                        dataUrl: compressedDataUrl,
+                        mimeType: mime,
+                        base64Data: compressedDataUrl.split(',')[1]
+                    });
+                };
+                img.onerror = () => {
+                    const mime = dataUrl.includes('image/png') ? 'image/png' : 'image/jpeg';
+                    resolve({
+                        dataUrl: dataUrl,
+                        mimeType: mime,
+                        base64Data: dataUrl.split(',')[1] || ''
+                    });
+                };
+                img.src = dataUrl;
+            });
+        }
+
         // Initialize App
         window.onload = function() {
             registerServiceWorker();
@@ -1563,30 +1604,31 @@
             imgEl.classList.remove("hidden");
             laser.classList.remove("hidden");
             statusWrapper.classList.remove("hidden");
-            statusMsg.innerText = "Scanning book stack layers...";
+            statusMsg.innerText = "Optimizing photo for Gemini Vision...";
 
             const reader = new FileReader();
             reader.onload = async function(e) {
                 imgEl.src = e.target.result;
 
                 try {
-                    const base64Content = e.target.result.split(',')[1];
-                    await callGeminiToScanStack(base64Content);
+                    // Optimize 12MP/50MP phone camera pictures down to ~300KB
+                    const optimized = await prepareImageForGemini(e.target.result);
+                    await callGeminiToScanStack(optimized.base64Data, optimized.mimeType);
                 } catch(err) {
                     laser.classList.add("hidden");
-                    statusMsg.innerText = "Failed reading image stack. Try again!";
-                    console.error(err);
+                    statusMsg.innerText = `Error: ${err.message || 'Failed reading image'}`;
+                    console.error("Camera preparation error:", err);
                 }
             };
             reader.readAsDataURL(file);
         }
 
         // Multi-book stack API Call with structured output Schema using Gemini 3.8 Flash + Google Books API Hybrid
-        async function callGeminiToScanStack(base64Data) {
+        async function callGeminiToScanStack(base64Data, mimeType = "image/jpeg") {
             const statusMsg = document.getElementById("scan-status-message");
             const laser = document.getElementById("scan-laser-line");
             
-            const apiKey = localStorage.getItem('myown_gemini_api_key') || localStorage.getItem('deetya_gemini_api_key') || "";
+            const apiKey = (localStorage.getItem('myown_gemini_api_key') || localStorage.getItem('deetya_gemini_api_key') || "").trim();
             const selectedModel = getSelectedGeminiModel();
 
             // Fallback to simulated Demo Scan if no API key is set
@@ -1640,7 +1682,7 @@
                         { text: promptText },
                         {
                             inlineData: {
-                                mimeType: "image/png",
+                                mimeType: mimeType,
                                 data: base64Data
                             }
                         }
@@ -1668,16 +1710,26 @@
                 }
             };
 
+            // Set up a 35-second network timeout controller
+            const abortController = new AbortController();
+            const timeoutId = setTimeout(() => abortController.abort(), 35000);
+
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    signal: abortController.signal
                 });
+                clearTimeout(timeoutId);
 
                 if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData?.error?.message || "API call failed");
+                    let errMsg = `Server returned HTTP ${response.status}`;
+                    try {
+                        const errData = await response.json();
+                        errMsg = errData?.error?.message || errMsg;
+                    } catch(_) {}
+                    throw new Error(errMsg);
                 }
 
                 const result = await response.json();
@@ -1705,12 +1757,16 @@
 
                     displayScannedResults(enrichedBooks);
                 } else {
-                    throw new Error("No textual content extracted from scanner.");
+                    throw new Error("No book records could be extracted from image.");
                 }
             } catch(e) {
-                statusMsg.innerText = "Nemo got dizzy! Check your API key in Settings (⚙️) and network, then try again.";
+                clearTimeout(timeoutId);
+                const displayErr = e.name === 'AbortError' 
+                    ? "Request timed out after 35s. Please check internet connection!"
+                    : e.message;
+                statusMsg.innerText = `Nemo got dizzy: ${displayErr}`;
                 laser.classList.add("hidden");
-                console.error("Scanning Error:", e);
+                console.error("Scanning Error Details:", e);
             }
         }
 
