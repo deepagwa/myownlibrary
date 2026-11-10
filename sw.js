@@ -1,15 +1,11 @@
-const CACHE_NAME = 'myownlibrary-v2';
+const CACHE_NAME = 'myownlibrary-v3';
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
   './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE).catch(() => Promise.resolve());
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
   self.skipWaiting();
 });
@@ -26,36 +22,42 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests for caching
   if (event.request.method !== 'GET') return;
 
-  // Fix: Chrome throws TypeError if cache is 'only-if-cached' and mode is not 'same-origin'
+  // Prevent Chrome TypeError for 'only-if-cached' with non-same-origin
   if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') {
     return;
   }
 
   const url = new URL(event.request.url);
 
-  // Never intercept external API calls (Gemini AI, Google Books, external fonts/CDNs)
+  // Never intercept or cache API endpoints
   if (url.hostname.includes('googleapis.com') || 
       url.hostname.includes('allorigins') || 
       url.origin !== self.location.origin) {
     return;
   }
 
+  // Network-First for HTML navigation so updates on GitHub show up immediately
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((res) => res || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Cache-First with Network fallback for static assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        return networkResponse;
-      }).catch(() => {
-        // Fallback for navigation requests if offline
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
+      return cachedResponse || fetch(event.request);
     })
   );
 });
