@@ -1711,10 +1711,6 @@
                 }
             };
 
-            // Set up a 45-second network timeout controller
-            const abortController = new AbortController();
-            const timeoutId = setTimeout(() => abortController.abort(), 45000);
-
             // Models to attempt: primary selected model, followed by reliable fallbacks if 404/400 occurs
             const modelsToTry = [selectedModel];
             if (selectedModel !== 'gemini-3.5-flash-lite') modelsToTry.push('gemini-3.5-flash-lite');
@@ -1723,13 +1719,20 @@
             let lastError = null;
 
             for (const modelCandidate of modelsToTry) {
+                // Create a fresh AbortController per attempt so retries do not inherit an already-aborted signal
+                const attemptController = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    attemptController.abort(new Error("Network timeout after 60s"));
+                }, 60000);
+
                 try {
+                    statusMsg.innerText = `Nemo is extracting spine text with ${modelCandidate}...`;
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelCandidate}:generateContent?key=${apiKey}`;
                     const response = await fetch(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload),
-                        signal: abortController.signal
+                        signal: attemptController.signal
                     });
 
                     if (!response.ok) {
@@ -1747,7 +1750,6 @@
                     }
 
                     const result = await response.json();
-                    clearTimeout(timeoutId);
 
                     // Extract content from non-thought parts
                     let jsonText = null;
@@ -1787,14 +1789,16 @@
                     }
                 } catch(err) {
                     lastError = err;
-                    if (err.name === 'AbortError') break;
+                    // If it was a user cancel or timeout, log and proceed with fallback model
+                    console.warn(`Attempt with ${modelCandidate} failed:`, err);
+                } finally {
+                    clearTimeout(timeoutId);
                 }
             }
 
-            clearTimeout(timeoutId);
             const displayErr = lastError?.name === 'AbortError' 
-                ? "Request timed out after 45s. Please check internet connection!"
-                : (lastError?.message || "Unknown error");
+                ? "Request took too long to respond. Please check your internet connection and try again!"
+                : (lastError?.message || "Unknown scanning error");
             statusMsg.innerText = `Nemo got dizzy: ${displayErr}`;
             laser.classList.add("hidden");
             console.error("Scanning Error Details:", lastError);
