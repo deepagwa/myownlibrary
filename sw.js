@@ -29,6 +29,17 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests for caching
   if (event.request.method !== 'GET') return;
 
+  // Do not intercept external API requests (Gemini AI or Google Books)
+  const url = new URL(event.request.url);
+  if (url.hostname.includes('googleapis.com') || url.hostname.includes('allorigins')) {
+    return;
+  }
+
+  // Chrome bug fix: 'only-if-cached' can only be set with 'same-origin' mode
+  if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
