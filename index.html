@@ -1673,8 +1673,6 @@
             - pattern (choose either 'solid', 'stripes', 'dots', or 'waves')
             - sticker (choose a fun kids emoji like 🦄, 🦖, ⚡, 🚀, 🐶, 🐱, 🌲, 🌸, 🔮, 🍩, 🎨)`;
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
-
             const payload = {
                 contents: [{
                     role: "user",
@@ -1710,64 +1708,83 @@
                 }
             };
 
-            // Set up a 35-second network timeout controller
+            // Set up a 45-second network timeout controller
             const abortController = new AbortController();
-            const timeoutId = setTimeout(() => abortController.abort(), 35000);
+            const timeoutId = setTimeout(() => abortController.abort(), 45000);
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    signal: abortController.signal
-                });
-                clearTimeout(timeoutId);
+            // Models to attempt: primary selected model, followed by reliable fallbacks if 404 occurs
+            const modelsToTry = [selectedModel];
+            if (selectedModel !== 'gemini-2.5-flash') modelsToTry.push('gemini-2.5-flash');
+            if (selectedModel !== 'gemini-3.5-flash-lite') modelsToTry.push('gemini-3.5-flash-lite');
 
-                if (!response.ok) {
-                    let errMsg = `Server returned HTTP ${response.status}`;
-                    try {
-                        const errData = await response.json();
-                        errMsg = errData?.error?.message || errMsg;
-                    } catch(_) {}
-                    throw new Error(errMsg);
+            let lastError = null;
+
+            for (const modelCandidate of modelsToTry) {
+                try {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelCandidate}:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                        signal: abortController.signal
+                    });
+
+                    if (!response.ok) {
+                        let errMsg = `HTTP ${response.status}`;
+                        try {
+                            const errData = await response.json();
+                            errMsg = errData?.error?.message || errMsg;
+                        } catch(_) {}
+
+                        // If model returned 404 (Not Found), try next fallback model
+                        if (response.status === 404) {
+                            lastError = new Error(errMsg);
+                            continue;
+                        }
+                        throw new Error(errMsg);
+                    }
+
+                    const result = await response.json();
+                    clearTimeout(timeoutId);
+
+                    const jsonText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (jsonText) {
+                        const rawBooks = JSON.parse(jsonText);
+                        statusMsg.innerText = "Fetching official metadata & covers from Google Books API...";
+                        
+                        const enrichedBooks = await Promise.all(rawBooks.map(async (b) => {
+                            const searchQuery = `${b.title} ${b.author || ''}`.trim();
+                            const meta = await fetchGoogleBooksMetadata(searchQuery);
+                            return {
+                                title: meta?.title || b.title,
+                                author: meta?.author || b.author || "Unknown",
+                                series: b.series || "",
+                                volume: b.volume || "",
+                                color: b.color || "#FFB3BA",
+                                pattern: b.pattern || "solid",
+                                sticker: b.sticker || "⭐️",
+                                coverUrl: meta?.coverUrl || null
+                            };
+                        }));
+
+                        displayScannedResults(enrichedBooks);
+                        return; // Successfully scanned and displayed!
+                    } else {
+                        throw new Error("No book records could be extracted from image.");
+                    }
+                } catch(err) {
+                    lastError = err;
+                    if (err.name === 'AbortError') break;
                 }
-
-                const result = await response.json();
-                const jsonText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-                
-                if (jsonText) {
-                    const rawBooks = JSON.parse(jsonText);
-                    
-                    statusMsg.innerText = "Fetching official metadata & covers from Google Books API...";
-                    
-                    const enrichedBooks = await Promise.all(rawBooks.map(async (b) => {
-                        const searchQuery = `${b.title} ${b.author || ''}`.trim();
-                        const meta = await fetchGoogleBooksMetadata(searchQuery);
-                        return {
-                            title: meta?.title || b.title,
-                            author: meta?.author || b.author || "Unknown",
-                            series: b.series || "",
-                            volume: b.volume || "",
-                            color: b.color || "#FFB3BA",
-                            pattern: b.pattern || "solid",
-                            sticker: b.sticker || "⭐️",
-                            coverUrl: meta?.coverUrl || null
-                        };
-                    }));
-
-                    displayScannedResults(enrichedBooks);
-                } else {
-                    throw new Error("No book records could be extracted from image.");
-                }
-            } catch(e) {
-                clearTimeout(timeoutId);
-                const displayErr = e.name === 'AbortError' 
-                    ? "Request timed out after 35s. Please check internet connection!"
-                    : e.message;
-                statusMsg.innerText = `Nemo got dizzy: ${displayErr}`;
-                laser.classList.add("hidden");
-                console.error("Scanning Error Details:", e);
             }
+
+            clearTimeout(timeoutId);
+            const displayErr = lastError?.name === 'AbortError' 
+                ? "Request timed out after 45s. Please check internet connection!"
+                : (lastError?.message || "Unknown error");
+            statusMsg.innerText = `Nemo got dizzy: ${displayErr}`;
+            laser.classList.add("hidden");
+            console.error("Scanning Error Details:", lastError);
         }
 
         // Render checklist UI for Scanned Stack
