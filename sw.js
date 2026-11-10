@@ -29,14 +29,17 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests for caching
   if (event.request.method !== 'GET') return;
 
-  // Do not intercept external API requests (Gemini AI or Google Books)
-  const url = new URL(event.request.url);
-  if (url.hostname.includes('googleapis.com') || url.hostname.includes('allorigins')) {
+  // Fix: Chrome throws TypeError if cache is 'only-if-cached' and mode is not 'same-origin'
+  if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') {
     return;
   }
 
-  // Chrome bug fix: 'only-if-cached' can only be set with 'same-origin' mode
-  if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin') {
+  const url = new URL(event.request.url);
+
+  // Never intercept external API calls (Gemini AI, Google Books, external fonts/CDNs)
+  if (url.hostname.includes('googleapis.com') || 
+      url.hostname.includes('allorigins') || 
+      url.origin !== self.location.origin) {
     return;
   }
 
