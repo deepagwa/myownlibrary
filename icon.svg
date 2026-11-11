@@ -1,0 +1,207 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient (Rich Deep Teal / Mint) -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="50%" stop-color="#0d9488"/>
+      <stop offset="100%" stop-color="#115e59"/>
+    </linearGradient>
+
+    <!-- Book 1 (Bottom): Royal Indigo / Deep Blue -->
+    <linearGradient id="book1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="18%" stop-color="#4f46e5"/>
+      <stop offset="82%" stop-color="#4338ca"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+
+    <!-- Book 2: Rich Coral Rose / Crimson -->
+    <linearGradient id="book2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9f1239"/>
+      <stop offset="18%" stop-color="#f43f5e"/>
+      <stop offset="82%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#881337"/>
+    </linearGradient>
+
+    <!-- Book 3: Emerald Jade -->
+    <linearGradient id="book3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="18%" stop-color="#10b981"/>
+      <stop offset="82%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+
+    <!-- Book 4: Sunshine Amber / Honey Gold -->
+    <linearGradient id="book4" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#92400e"/>
+      <stop offset="18%" stop-color="#fbbf24"/>
+      <stop offset="82%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+
+    <!-- Book 5 (Top): Lavender Purple / Violet -->
+    <linearGradient id="book5" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#581c87"/>
+      <stop offset="18%" stop-color="#a855f7"/>
+      <stop offset="82%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#3b0764"/>
+    </linearGradient>
+
+    <!-- Page Rim Shading -->
+    <linearGradient id="pageGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+
+    <!-- Gold Foil Accents -->
+    <linearGradient id="goldFoil" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+
+    <!-- Deep Drop Shadow -->
+    <filter id="stackShadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#042f2e" flood-opacity="0.45"/>
+    </filter>
+
+    <!-- Individual Spine Shadow -->
+    <filter id="spineShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background Base (Safe for Android Adaptive/Maskable crop) -->
+  <rect width="512" height="512" rx="118" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Magic Radial Halo behind the stack -->
+  <circle cx="256" cy="265" r="175" fill="#ffffff" fill-opacity="0.08"/>
+
+  <!-- MAIN STACK OF 5 BOOKS -->
+  <g filter="url(#stackShadow)">
+
+    <!-- ================= BOOK 1 (BOTTOM: Indigo) ================= -->
+    <!-- Spine dimensions: w: 320, h: 54, pos: 96, 375 -->
+    <g filter="url(#spineShadow)">
+      <!-- Pages Rim -->
+      <path d="M 116 385 L 396 385 L 390 420 L 122 420 Z" fill="url(#pageGrad)"/>
+      <line x1="128" y1="397" x2="388" y2="397" stroke="#ca8a04" stroke-opacity="0.3" stroke-width="1.5"/>
+      <line x1="130" y1="408" x2="384" y2="408" stroke="#ca8a04" stroke-opacity="0.3" stroke-width="1.5"/>
+      <!-- Main Spine -->
+      <rect x="96" y="375" width="320" height="54" rx="13" fill="url(#book1)"/>
+      <!-- Spine Edge Embossing -->
+      <rect x="124" y="375" width="4" height="54" fill="#ffffff" fill-opacity="0.22"/>
+      <rect x="133" y="375" width="2.5" height="54" fill="#000000" fill-opacity="0.2"/>
+      <!-- Gold Title Plate -->
+      <rect x="210" y="392" width="92" height="20" rx="4" fill="url(#goldFoil)" fill-opacity="0.95"/>
+      <!-- Gold Bookmark Star -->
+      <circle cx="165" cy="402" r="5" fill="#fde047"/>
+    </g>
+
+    <!-- ================= BOOK 2 (Coral Rose - slight left tilt) ================= -->
+    <!-- Spine dimensions: w: 290, h: 50, center ~256, 332 -->
+    <g transform="rotate(-3.5 256 345)" filter="url(#spineShadow)">
+      <!-- Pages Rim -->
+      <path d="M 128 340 L 382 340 L 376 372 L 134 372 Z" fill="url(#pageGrad)"/>
+      <line x1="138" y1="351" x2="376" y2="351" stroke="#ca8a04" stroke-opacity="0.3" stroke-width="1.5"/>
+      <line x1="140" y1="361" x2="372" y2="361" stroke="#ca8a04" stroke-opacity="0.3" stroke-width="1.5"/>
+      <!-- Main Spine -->
+      <rect x="111" y="330" width="290" height="50" rx="12" fill="url(#book2)"/>
+      <!-- Spine Emboss -->
+      <rect x="137" y="330" width="3.5" height="50" fill="#ffffff" fill-opacity="0.28"/>
+      <rect x="145" y="330" width="2" height="50" fill="#000000" fill-opacity="0.18"/>
+      <!-- Spine Dots Pattern -->
+      <circle cx="215" cy="355" r="4.5" fill="#ffffff" fill-opacity="0.85"/>
+      <circle cx="240" cy="355" r="4.5" fill="#ffffff" fill-opacity="0.85"/>
+      <circle cx="265" cy="355" r="4.5" fill="#ffffff" fill-opacity="0.85"/>
+      <circle cx="290" cy="355" r="4.5" fill="#ffffff" fill-opacity="0.85"/>
+    </g>
+
+    <!-- ================= BOOK 3 (Emerald Green - slight right tilt) ================= -->
+    <!-- Spine dimensions: w: 275, h: 48, center ~256, 290 -->
+    <g transform="rotate(3 256 295)" filter="url(#spineShadow)">
+      <!-- Pages Rim -->
+      <path d="M 136 298 L 374 298 L 368 328 L 142 328 Z" fill="url(#pageGrad)"/>
+      <line x1="146" y1="308" x2="366" y2="308" stroke="#ca8a04" stroke-opacity="0.3" stroke-width="1.5"/>
+      <line x1="148" y1="318" x2="362" y2="318" stroke="#ca8a04" stroke-opacity="0.3" stroke-width="1.5"/>
+      <!-- Main Spine -->
+      <rect x="118.5" y="288" width="275" height="48" rx="11" fill="url(#book3)"/>
+      <!-- Spine Emboss -->
+      <rect x="143" y="288" width="3.5" height="48" fill="#ffffff" fill-opacity="0.25"/>
+      <rect x="151" y="288" width="2" height="48" fill="#000000" fill-opacity="0.18"/>
+      <!-- Gold Striping -->
+      <line x1="185" y1="288" x2="185" y2="336" stroke="url(#goldFoil)" stroke-width="3"/>
+      <line x1="192" y1="288" x2="192" y2="336" stroke="url(#goldFoil)" stroke-width="1.5"/>
+      <line x1="320" y1="288" x2="320" y2="336" stroke="url(#goldFoil)" stroke-width="3"/>
+      <line x1="313" y1="288" x2="313" y2="336" stroke="url(#goldFoil)" stroke-width="1.5"/>
+    </g>
+
+    <!-- ================= BOOK 4 (Sunshine Gold - slight left shift) ================= -->
+    <!-- Spine dimensions: w: 250, h: 46, center ~256, 250 -->
+    <g transform="rotate(-2 256 250)" filter="url(#spineShadow)">
+      <!-- Pages Rim -->
+      <path d="M 148 256 L 362 256 L 358 284 L 152 284 Z" fill="url(#pageGrad)"/>
+      <line x1="156" y1="265" x2="356" y2="265" stroke="#ca8a04" stroke-opacity="0.35" stroke-width="1.5"/>
+      <line x1="158" y1="274" x2="352" y2="274" stroke="#ca8a04" stroke-opacity="0.35" stroke-width="1.5"/>
+      <!-- Main Spine -->
+      <rect x="131" y="246" width="250" height="46" rx="10" fill="url(#book4)"/>
+      <!-- Spine Emboss -->
+      <rect x="154" y="246" width="3.5" height="46" fill="#ffffff" fill-opacity="0.35"/>
+      <rect x="161" y="246" width="2" height="46" fill="#000000" fill-opacity="0.15"/>
+      <!-- White Zig-Zag Motif -->
+      <path d="M 200 269 L 210 263 L 220 269 L 230 263 L 240 269 L 250 263 L 260 269 L 270 263 L 280 269" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.9"/>
+    </g>
+
+    <!-- ================= BOOK 5 (TOP: Violet Storybook + Hanging Bookmark Ribbon) ================= -->
+    <!-- Spine dimensions: w: 225, h: 44, center ~256, 210 -->
+    <g transform="rotate(1.5 256 210)" filter="url(#spineShadow)">
+      <!-- Book Top Face (Isometric 3D Perspective showing book cover) -->
+      <polygon points="144,210 185,174 380,174 369,210" fill="#7e22ce"/>
+      <polygon points="144,210 185,174 195,174 154,210" fill="#a855f7" fill-opacity="0.6"/>
+
+      <!-- Pages Rim Under Cover -->
+      <polygon points="369,210 380,174 388,182 376,218" fill="url(#pageGrad)"/>
+
+      <!-- Front Spine -->
+      <rect x="143.5" y="206" width="225" height="44" rx="10" fill="url(#book5)"/>
+      <!-- Spine Emboss -->
+      <rect x="164" y="206" width="3" height="44" fill="#ffffff" fill-opacity="0.35"/>
+      <rect x="170" y="206" width="2" height="44" fill="#000000" fill-opacity="0.2"/>
+      <!-- Gold Embossed Star Crest on Top Spine -->
+      <polygon points="256,220 259,228 267,228 261,233 263,241 256,236 249,241 251,233 245,228 253,228" fill="url(#goldFoil)"/>
+
+      <!-- Hanging Red Bookmark Ribbon cascading down across books -->
+      <path d="M 305 240 Q 312 285 300 325 Q 295 342 305 355 L 318 350 Q 308 338 312 320 Q 324 280 317 240 Z" fill="#ef4444"/>
+      <!-- Ribbon Swallowtail notch -->
+      <polygon points="298,353 305,346 318,350 312,357 305,352" fill="#b91c1c"/>
+    </g>
+
+  </g> <!-- END STACK SHADOW GROUP -->
+
+  <!-- ================= SPARKLING MAGIC (Reading Fairy Dust) ================= -->
+  <!-- Top Center Magic Star Burst -->
+  <g transform="translate(256, 115)">
+    <path d="M 0 -35 Q 0 0 35 0 Q 0 0 0 35 Q 0 0 -35 0 Q 0 0 0 -35 Z" fill="#fef08a"/>
+    <circle cx="0" cy="0" r="6" fill="#ffffff"/>
+  </g>
+
+  <!-- Left Upper Twinkle Star -->
+  <g transform="translate(135, 140) scale(0.65)">
+    <path d="M 0 -30 Q 0 0 30 0 Q 0 0 0 30 Q 0 0 -30 0 Q 0 0 0 -30 Z" fill="#fed7aa"/>
+    <circle cx="0" cy="0" r="4" fill="#ffffff"/>
+  </g>
+
+  <!-- Right Upper Twinkle Star -->
+  <g transform="translate(378, 130) scale(0.7)">
+    <path d="M 0 -30 Q 0 0 30 0 Q 0 0 0 30 Q 0 0 -30 0 Q 0 0 0 -30 Z" fill="#fef08a"/>
+    <circle cx="0" cy="0" r="4" fill="#ffffff"/>
+  </g>
+
+  <!-- Magical Glow Dots -->
+  <circle cx="190" cy="110" r="3.5" fill="#ffffff" fill-opacity="0.95"/>
+  <circle cx="320" cy="98"  r="4"   fill="#fef08a" fill-opacity="0.9"/>
+  <circle cx="410" cy="190" r="4"   fill="#ffffff" fill-opacity="0.9"/>
+  <circle cx="105" cy="205" r="3.5" fill="#fef08a" fill-opacity="0.85"/>
+  <circle cx="90"  cy="340" r="3"   fill="#ffffff" fill-opacity="0.75"/>
+  <circle cx="425" cy="330" r="3.5" fill="#fef08a" fill-opacity="0.8"/>
+</svg>
