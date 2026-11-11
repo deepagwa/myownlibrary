@@ -51,31 +51,45 @@
         .book-spine-item {
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
             transform-origin: bottom center;
+            box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.16), inset 1px 0 2px rgba(255, 255, 255, 0.45);
         }
         .book-spine-item:hover {
-            transform: scale(1.08) translateY(-4px) !important;
-            z-index: 10;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transform: scale(1.08) translateY(-6px) !important;
+            z-index: 20;
+            box-shadow: 0 14px 20px -3px rgba(0, 0, 0, 0.35);
         }
         .book-spine-item:active {
-            transform: scale(1.12) translateY(-6px) !important;
-            z-index: 10;
-            box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.4);
+            transform: scale(1.12) translateY(-8px) !important;
+            z-index: 30;
+            box-shadow: 0 16px 24px -3px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Photorealistic 3D Spine Lighting & Curvature Sheen (Clean & Translucent) */
+        .spine-3d-sheen {
+            background: linear-gradient(
+                90deg,
+                rgba(0,0,0,0.12) 0%,
+                rgba(255,255,255,0.48) 22%,
+                rgba(255,255,255,0.12) 50%,
+                rgba(0,0,0,0.04) 80%,
+                rgba(0,0,0,0.18) 100%
+            );
+            pointer-events: none;
         }
 
         /* Spine custom patterns */
         .pattern-stripes {
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 255, 255, 0.15) 8px, rgba(255, 255, 255, 0.15) 16px);
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 255, 255, 0.28) 8px, rgba(255, 255, 255, 0.28) 16px);
         }
         .pattern-dots {
-            background-image: radial-gradient(rgba(255, 255, 255, 0.25) 20%, transparent 20%);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.38) 20%, transparent 20%);
             background-size: 8px 8px;
         }
         .pattern-waves {
-            background-image: repeating-linear-gradient(0deg, transparent, transparent 6px, rgba(255, 255, 255, 0.15) 6px, rgba(255, 255, 255, 0.15) 12px);
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 6px, rgba(255, 255, 255, 0.25) 6px, rgba(255, 255, 255, 0.25) 12px);
         }
         .pattern-stars {
-            background-image: radial-gradient(rgba(255, 255, 255, 0.3) 15%, transparent 15%), radial-gradient(rgba(255, 255, 255, 0.3) 15%, transparent 15%);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.38) 15%, transparent 15%), radial-gradient(rgba(255, 255, 255, 0.38) 15%, transparent 15%);
             background-size: 16px 16px;
             background-position: 0 0, 8px 8px;
         }
@@ -83,7 +97,7 @@
         /* Physical Wooden Shelves Styling */
         .wooden-shelf {
             background: linear-gradient(to bottom, #d2a679 0%, #b08257 30%, #8d5d38 85%, #664022 100%);
-            box-shadow: 0 8px 12px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.25);
+            box-shadow: 0 10px 14px rgba(0,0,0,0.22), inset 0 2px 4px rgba(255,255,255,0.35);
             border-bottom: 4px solid #4a2c13;
         }
 
@@ -97,12 +111,6 @@
             writing-mode: vertical-lr;
             text-orientation: mixed;
             transform: rotate(180deg);
-        }
-
-        /* Bookshelf scrolling container */
-        .shelf-scroll-area {
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         /* Neon glow scanner lines */
@@ -121,14 +129,14 @@
     <!-- PWA Main Container Viewport -->
     <div class="w-full h-full flex flex-col relative overflow-hidden">
 
-        <!-- Toast Notifications (Only for direct user actions, no random tips) -->
+        <!-- Toast Notifications (Direct user actions only) -->
         <div id="toast-notification" class="hidden absolute top-4 left-4 right-4 bg-teal-500 text-white rounded-2xl p-3 shadow-xl z-50 transition-all duration-300 flex items-center space-x-3 border-2 border-white">
             <span id="toast-emoji" class="text-2xl">🌟</span>
             <p id="toast-text" class="text-sm font-semibold leading-snug flex-1"></p>
         </div>
 
-        <!-- Main Scrollable Screen Area -->
-        <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col bg-amber-50/20 pb-28">
+        <!-- Main Scrollable Screen Area with generous bottom padding so the last shelf is never clipped -->
+        <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col bg-amber-50/20 pb-40">
 
             <!-- App Header & Mascot (Nemo the Bookworm) -->
             <div class="p-4 bg-gradient-to-b from-teal-400 to-emerald-400 text-white rounded-b-[2.5rem] shadow-md relative pb-6">
@@ -151,14 +159,14 @@
                     </button>
                 </div>
 
-                <!-- Mascot Greeting Box (Clean & static, no intrusive banner intervals) -->
+                <!-- Mascot Greeting Box -->
                 <div class="flex items-center space-x-3 bg-white/95 text-slate-800 rounded-2xl p-3 shadow-sm border border-emerald-100 mt-2">
                     <div class="w-10 h-10 bg-emerald-100 rounded-full flex-shrink-0 flex items-center justify-center border-2 border-emerald-400 text-xl">
                         🐛
                     </div>
                     <div class="flex-1 text-xs">
                         <p class="font-bold text-emerald-600">Nemo's Library</p>
-                        <p id="nemo-speech" class="text-slate-600 text-[11px]">Welcome to your personal bookshelf collection!</p>
+                        <p id="nemo-speech" class="text-slate-600 text-[11px]">Welcome to your personal bookshelf collection with real book covers!</p>
                     </div>
                 </div>
             </div>
@@ -214,9 +222,9 @@
                 </div>
             </div>
 
-            <!-- Dynamic Graphical wooden Library Shelf Area (Fully Scrollable, unclipped) -->
-            <div id="library-shelves-container" class="mt-4 px-3 pb-8 shelf-back min-h-[450px] flex-1">
-                <!-- All shelves dynamically populate here and scroll smoothly -->
+            <!-- Dynamic Graphical Wooden Library Shelf Area with generous padding for full visibility -->
+            <div id="library-shelves-container" class="mt-4 px-3 pb-20 shelf-back min-h-[450px] flex-1">
+                <!-- All shelves dynamically populate here and scroll smoothly without cutting off -->
             </div>
 
         </div>
@@ -729,8 +737,9 @@
             <div class="flex items-center space-x-3 bg-indigo-50/50 p-3 rounded-2xl border border-indigo-100/50">
                 <!-- 3D Book Binding Spine Visualizer -->
                 <div id="detail-spine-preview" class="w-14 h-24 rounded-lg flex flex-col items-center justify-between p-2 shadow-md relative overflow-hidden border border-black/10 shrink-0">
-                    <span class="text-lg">⭐</span>
-                    <div class="w-0.5 h-12 bg-black/15"></div>
+                    <div class="spine-3d-sheen absolute inset-0 z-0"></div>
+                    <span class="text-lg relative z-10">⭐</span>
+                    <div class="w-0.5 h-12 bg-black/15 relative z-10"></div>
                 </div>
 
                 <!-- Custom Front Cover Art Visualizer -->
@@ -743,6 +752,10 @@
                     <button onclick="toggleBookStatus()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-2 rounded-xl text-[10px] flex items-center justify-center space-x-1 shadow-sm transition animate-bounce">
                         <i class="fa-solid fa-rotate"></i>
                         <span id="toggle-status-btn-text">Mark Completed & Celebrate!</span>
+                    </button>
+                    <button onclick="refreshCoverFromGoogleBooks()" id="btn-fetch-cover" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-2 rounded-xl text-[10px] flex items-center justify-center space-x-1 border border-indigo-200 transition" title="Fetch fresh official cover art">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span id="fetch-cover-text">Fetch Official Cover Art</span>
                     </button>
                     <button onclick="deleteActiveBook()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2 rounded-xl text-[10px] flex items-center justify-center space-x-1 border border-rose-200 transition">
                         <i class="fa-solid fa-trash-can"></i>
@@ -776,30 +789,75 @@
             return localStorage.getItem('myown_gemini_model') || 'gemini-3.8-flash';
         }
 
-        // Google Books API Free Metadata Lookup
+        // Clean query text helper
+        function cleanBookQuery(text) {
+            if (!text) return "";
+            return text
+                .replace(/[:\-–—]\s*.+$/, '') // strip subtitles after colon or dash
+                .replace(/[()]/g, ' ')
+                .replace(/\b(vol|volume|book|no|part)\.?\s*\d+\b/gi, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        // Dual Engine Metadata & Cover Art Lookup (Google Books + Open Library Fallback)
         async function fetchGoogleBooksMetadata(query) {
+            if (!query) return null;
+            const cleaned = cleanBookQuery(query);
+
+            // 1. First attempt: Google Books API
             try {
-                const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`);
-                if (!res.ok) return null;
-                const data = await res.json();
-                if (data.items && data.items.length > 0) {
-                    const info = data.items[0].volumeInfo;
-                    const coverThumbnail = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || null;
-                    return {
-                        title: info.title || null,
-                        author: info.authors ? info.authors.join(', ') : null,
-                        coverUrl: coverThumbnail ? coverThumbnail.replace('http:', 'https:') : null,
-                        publishedDate: info.publishedDate || null,
-                        description: info.description || null
-                    };
+                const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(cleaned)}&maxResults=1`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.items && data.items.length > 0) {
+                        const info = data.items[0].volumeInfo;
+                        let coverThumbnail = info.imageLinks?.extraLarge || 
+                                             info.imageLinks?.large || 
+                                             info.imageLinks?.medium || 
+                                             info.imageLinks?.thumbnail || 
+                                             info.imageLinks?.smallThumbnail || null;
+                        
+                        if (coverThumbnail) {
+                            coverThumbnail = coverThumbnail.replace(/^http:\/\//i, 'https://').replace('&edge=curl', '');
+                            return {
+                                title: info.title || null,
+                                author: info.authors ? info.authors.join(', ') : null,
+                                coverUrl: coverThumbnail,
+                                publishedDate: info.publishedDate || null
+                            };
+                        }
+                    }
                 }
             } catch(e) {
-                console.warn("Google Books API lookup failed for query:", query, e);
+                console.warn("Google Books API query failed:", cleaned, e);
             }
+
+            // 2. Second attempt: Open Library Search API (Reliable open cover CDN)
+            try {
+                const olRes = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(cleaned)}&limit=1`);
+                if (olRes.ok) {
+                    const olData = await olRes.json();
+                    if (olData.docs && olData.docs.length > 0) {
+                        const doc = olData.docs[0];
+                        if (doc.cover_i) {
+                            return {
+                                title: doc.title || null,
+                                author: doc.author_name ? doc.author_name.join(', ') : null,
+                                coverUrl: `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`,
+                                publishedDate: doc.first_publish_year || null
+                            };
+                        }
+                    }
+                }
+            } catch(e) {
+                console.warn("Open Library fallback failed:", cleaned, e);
+            }
+
             return null;
         }
 
-        // Manual Entry Auto-Fill with Google Books API (Uses 0 AI tokens)
+        // Manual Entry Auto-Fill with Google Books / Open Library (0 AI tokens)
         async function autoFillFromGoogleBooks() {
             const titleInput = document.getElementById("add-title");
             const query = titleInput.value.trim();
@@ -807,7 +865,7 @@
                 showNemoMessage("Type a book title first to auto-fill details!", "🔍");
                 return;
             }
-            showNemoMessage("Searching Google Books database...", "⏳");
+            showNemoMessage("Searching library databases for real cover art...", "⏳");
             const meta = await fetchGoogleBooksMetadata(query);
             if (meta) {
                 if (meta.title) titleInput.value = meta.title;
@@ -819,9 +877,42 @@
                     toggleCoverInputs();
                     document.getElementById("cover-upload-status").innerText = "Auto-Loaded! ✅";
                 }
-                showNemoMessage(`Found "${meta.title}" on Google Books! ✨`, "📚");
+                showNemoMessage(`Found "${meta.title}" with real cover art! ✨`, "📚");
             } else {
-                showNemoMessage("No exact match found on Google Books. You can still type details manually!", "💡");
+                showNemoMessage("No exact cover found online. You can still customize pastel colors & stickers!", "💡");
+            }
+        }
+
+        // Allow user to fetch / refresh real cover art for existing books in the drawer
+        async function refreshCoverFromGoogleBooks() {
+            if (!state.activeBookId) return;
+            const book = state.books.find(b => b.id === state.activeBookId);
+            if (!book) return;
+
+            const btnText = document.getElementById("fetch-cover-text");
+            if (btnText) btnText.innerText = "Searching...";
+
+            showNemoMessage("Searching Google Books & Open Library...", "⏳");
+            
+            // Try with title + author, then fallback to title alone
+            let query = `${book.title} ${book.author || ''}`.trim();
+            let meta = await fetchGoogleBooksMetadata(query);
+            if (!meta || !meta.coverUrl) {
+                meta = await fetchGoogleBooksMetadata(book.title);
+            }
+
+            if (btnText) btnText.innerText = "Fetch Official Cover Art";
+
+            if (meta && meta.coverUrl) {
+                book.coverType = 'upload-url';
+                book.coverData = meta.coverUrl;
+                if (meta.author && (!book.author || book.author === 'Unknown')) book.author = meta.author;
+                saveToStorage();
+                renderApp();
+                openBookDrawer(book.id);
+                showNemoMessage(`Official cover art loaded for "${book.title}"!`, "🎉");
+            } else {
+                showNemoMessage(`Could not find an online cover for "${book.title}".`, "ℹ️");
             }
         }
 
@@ -841,7 +932,7 @@
             groupingMode: 'author',
             searchQuery: '',
             spineCustomization: {
-                color: '#FFB3BA',
+                color: '#F472B6',
                 pattern: 'solid',
                 sticker: '⭐️'
             },
@@ -853,15 +944,6 @@
             parsedImportBooksTemp: [],
             extractedPDFText: ""
         };
-
-        // Standard speech arrays for Nemo Mascot
-        const NEMO_QUOTES = [
-            `"Wow! Your bookshelves look absolutely spectacular!" 🌸`,
-            `"Did you know reading builds powerful imagination wizardry?" 🔮`,
-            `"Let's put some more exciting book stacks on our wooden shelves!" ✨`,
-            `"A cozy library is the happiest spot in the world!" 🌳`,
-            `"Splendid progress! Keep reading to reach the star galaxy!" 🌌`
-        ];
 
         // Safe Base64 Image Compression to fit LocalStorage limits
         function compressImage(base64Str, maxWidth = 100, maxHeight = 150) {
@@ -914,7 +996,6 @@
                     canvas.width = w;
                     canvas.height = h;
                     const ctx = canvas.getContext('2d');
-                    // Sharpen contrast for better spine text OCR
                     ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, w, h);
                     const mime = 'image/jpeg';
@@ -942,7 +1023,8 @@
             loadBooksFromStorage();
             updateHeaderModelBadge();
             renderApp();
-            // Removed automatic speech interval popups to keep UI quiet and clean
+            // Automatically upgrade seeded books with real cover images
+            upgradeInitialBooksWithCovers();
         };
 
         // Service Worker registration helper for PWA
@@ -951,6 +1033,26 @@
                 navigator.serviceWorker.register('./sw.js').catch(err => {
                     console.log('ServiceWorker registration deferred:', err);
                 });
+            }
+        }
+
+        // Seamlessly upgrades any books without real cover art by querying online databases
+        async function upgradeInitialBooksWithCovers() {
+            let updated = false;
+            for (const book of state.books) {
+                // If cover is missing or using an older unreachable URL, refresh it
+                if (!book.coverData || book.coverType !== 'upload-url' || book.coverData.includes('http:')) {
+                    const meta = await fetchGoogleBooksMetadata(`${book.title} ${book.author}`);
+                    if (meta && meta.coverUrl) {
+                        book.coverType = 'upload-url';
+                        book.coverData = meta.coverUrl;
+                        updated = true;
+                    }
+                }
+            }
+            if (updated) {
+                saveToStorage();
+                renderApp();
             }
         }
 
@@ -1021,6 +1123,7 @@
                 if (raw) {
                     state.books = JSON.parse(raw);
                 } else {
+                    // Seed initial child books with reliable Open Library / HTTPS Google covers and vibrant colors
                     state.books = [
                         {
                             id: 'book1',
@@ -1031,13 +1134,13 @@
                             status: 'read',
                             month: 'Jun',
                             year: 2026,
-                            coverType: 'preset',
-                            coverData: 'galaxy',
-                            color: '#E8AEFF',
+                            coverType: 'upload-url',
+                            coverData: 'https://covers.openlibrary.org/b/id/10521270-M.jpg',
+                            color: '#F472B6', // Vibrant Rose Pink
                             pattern: 'stripes',
                             sticker: '⚡',
                             rating: 5,
-                            tilt: -3
+                            tilt: -2
                         },
                         {
                             id: 'book2',
@@ -1048,9 +1151,9 @@
                             status: 'reading',
                             month: 'Jun',
                             year: 2026,
-                            coverType: 'preset',
-                            coverData: 'unicorn',
-                            color: '#FFDFBA',
+                            coverType: 'upload-url',
+                            coverData: 'https://covers.openlibrary.org/b/id/13247018-M.jpg',
+                            color: '#FBBF24', // Vibrant Amber Gold
                             pattern: 'dots',
                             sticker: '🐶',
                             rating: 4,
@@ -1065,9 +1168,9 @@
                             status: 'read',
                             month: 'May',
                             year: 2026,
-                            coverType: 'preset',
-                            coverData: 'galaxy',
-                            color: '#BAE1FF',
+                            coverType: 'upload-url',
+                            coverData: 'https://covers.openlibrary.org/b/id/8235111-M.jpg',
+                            color: '#60A5FA', // Vibrant Sky Blue
                             pattern: 'waves',
                             sticker: '🔱',
                             rating: 5,
@@ -1102,7 +1205,7 @@
             }
         }
 
-        // Interactive custom toast system for Nemo the Bookworm (Shown only on direct actions)
+        // Interactive toast system for direct actions
         function showNemoMessage(msg, emoji = '🐛') {
             const container = document.getElementById("toast-notification");
             const text = document.getElementById("toast-text");
@@ -1188,7 +1291,7 @@
             });
         }
 
-        // Physical shelf layout compiler
+        // Physical shelf layout compiler with VIBRANT SPINES & RELIABLE COVER ART
         function renderBookshelf() {
             const container = document.getElementById("library-shelves-container");
             if (!container) return;
@@ -1213,7 +1316,6 @@
                     groups[ser].push(b);
                 });
             } else if (state.groupingMode === 'title') {
-                // Group alphabetically by first letter (A-Z) so every letter gets its own shelf!
                 filtered.sort((a,b) => a.title.localeCompare(b.title)).forEach(b => {
                     const letter = (b.title || '').trim().charAt(0).toUpperCase() || '#';
                     const key = `Shelf "${letter}"`;
@@ -1241,13 +1343,14 @@
                 return;
             }
 
-            // Render EVERY shelf cleanly
-            groupKeys.forEach(groupName => {
+            groupKeys.forEach((groupName, groupIdx) => {
                 const shelfBooks = groups[groupName];
                 if (!shelfBooks || shelfBooks.length === 0) return;
 
                 const shelfWrapper = document.createElement("div");
-                shelfWrapper.className = "mb-8 relative pt-7 flex flex-col";
+                // Last shelf gets extra padding-bottom so it clears the floating bottom dock completely
+                const isLast = (groupIdx === groupKeys.length - 1);
+                shelfWrapper.className = `relative pt-7 flex flex-col ${isLast ? 'mb-16' : 'mb-9'}`;
 
                 const nameplate = document.createElement("div");
                 nameplate.className = "absolute top-0 left-2 bg-[#ffdfba] text-[#5c3a21] border border-[#d2a679] shadow-sm rounded-md px-3 py-0.5 text-[9px] font-black uppercase tracking-wider z-10 flex items-center space-x-1";
@@ -1255,7 +1358,7 @@
                 shelfWrapper.appendChild(nameplate);
 
                 const booksRow = document.createElement("div");
-                booksRow.className = "flex items-end justify-start space-x-1.5 px-4 min-h-[110px] relative z-10 pt-2 pb-1.5 overflow-x-auto no-scrollbar";
+                booksRow.className = "flex items-end justify-start space-x-2 px-4 min-h-[126px] relative z-10 pt-2 pb-1.5 overflow-x-auto no-scrollbar";
                 
                 shelfBooks.forEach(book => {
                     const bookSpine = document.createElement("div");
@@ -1263,23 +1366,47 @@
                     const tilt = book.tilt !== undefined ? book.tilt : (Math.random() * 6 - 3).toFixed(1);
                     book.tilt = parseFloat(tilt);
 
-                    const spineColor = book.color || '#FFB3BA';
+                    const spineColor = book.color || '#F472B6';
                     let patternClass = "";
                     if (book.pattern && book.pattern !== 'solid') {
                         patternClass = `pattern-${book.pattern}`;
                     }
 
-                    bookSpine.className = `book-spine-item ${patternClass} w-6 h-24 rounded-t-md flex flex-col items-center justify-between py-2 text-center text-slate-800 font-bold relative shadow-md border-r border-black/10 shrink-0 cursor-pointer`;
+                    const hasCoverImage = book.coverType === 'upload-url' && book.coverData && book.coverData.length > 5;
+                    
+                    // Render spine with solid vibrant color base + crisp 3D sheen overlay
+                    bookSpine.className = `book-spine-item ${patternClass} w-7 h-28 rounded-t-md flex flex-col items-center justify-between py-2 text-center font-bold relative border-r border-black/20 shrink-0 cursor-pointer overflow-hidden`;
                     bookSpine.style.backgroundColor = spineColor;
                     bookSpine.style.transform = `rotate(${book.tilt}deg)`;
                     bookSpine.setAttribute("onclick", `openBookDrawer('${book.id}')`);
 
+                    // Embedded cover background with graceful fallback if the image fails to load
+                    const coverImgHtml = hasCoverImage ? `
+                        <img src="${book.coverData}" alt="cover" class="absolute inset-0 w-full h-full object-cover object-left opacity-90 z-0 pointer-events-none" onerror="this.style.display='none'">
+                    ` : '';
+
+                    // Vibrant, readable pill for spine titles (no murky dark blocks)
+                    const titleBadgeHtml = hasCoverImage
+                        ? `<span class="vertical-spine-text bg-amber-50/90 text-amber-950 font-black border border-amber-300/80 shadow-sm px-0.5 py-1 rounded text-[8px] tracking-tight uppercase leading-tight line-clamp-1 truncate max-h-[62px] w-full text-center relative z-20">${book.title}</span>`
+                        : `<span class="vertical-spine-text text-slate-900 font-black text-[8.5px] tracking-tight uppercase leading-tight line-clamp-1 truncate max-h-[62px] w-full text-center relative z-20" style="text-shadow: 0 1px 2px rgba(255,255,255,0.85);">${book.title}</span>`;
+
+                    const volBadgeHtml = hasCoverImage
+                        ? `<span class="text-[7px] text-amber-950 bg-amber-200/95 border border-amber-300 px-1 rounded-full font-black tracking-widest relative z-20">${book.volume ? 'V' + book.volume : '•'}</span>`
+                        : `<span class="text-[7px] text-black/75 font-black tracking-widest relative z-20">${book.volume ? 'V' + book.volume : '•'}</span>`;
+
                     bookSpine.innerHTML = `
-                        <span class="text-[10px] filter drop-shadow-sm select-none">${book.sticker || '⭐'}</span>
-                        <span class="vertical-spine-text text-[8px] tracking-tight uppercase leading-none line-clamp-1 truncate max-h-[50px] text-slate-900 filter drop-shadow-sm font-black w-full text-center">
-                            ${book.title}
-                        </span>
-                        <span class="text-[7px] text-black/40 font-black tracking-widest">${book.volume ? 'V' + book.volume : '•'}</span>
+                        ${coverImgHtml}
+                        <!-- Photorealistic Translucent 3D Sheen Highlight (Lets color and art pop through!) -->
+                        <div class="spine-3d-sheen absolute inset-0 z-10"></div>
+
+                        <!-- Tiny sticker tag / bookmark crest -->
+                        <span class="text-[11px] filter drop-shadow select-none relative z-20">${book.sticker || '⭐'}</span>
+                        
+                        <!-- Book title in vertical direction with vibrant readable pill -->
+                        ${titleBadgeHtml}
+                        
+                        <!-- Vol signifier if available -->
+                        ${volBadgeHtml}
                     `;
 
                     booksRow.appendChild(bookSpine);
@@ -1675,7 +1802,7 @@
                 imgEl.src = e.target.result;
 
                 try {
-                    // Optimize 12MP/50MP phone camera pictures down to ~300KB
+                    // Optimize phone camera pictures down to ~300KB
                     const optimized = await prepareImageForGemini(e.target.result);
                     await callGeminiToScanStack(optimized.base64Data, optimized.mimeType);
                 } catch(err) {
@@ -1687,7 +1814,7 @@
             reader.readAsDataURL(file);
         }
 
-        // Multi-book stack API Call with structured output Schema using Gemini 3.8 Flash + Google Books API Hybrid
+        // Multi-book stack API Call with Gemini + Google Books / Open Library Hybrid
         async function callGeminiToScanStack(base64Data, mimeType = "image/jpeg") {
             const statusMsg = document.getElementById("scan-status-message");
             const laser = document.getElementById("scan-laser-line");
@@ -1697,14 +1824,14 @@
 
             // Fallback to simulated Demo Scan if no API key is set
             if (!apiKey) {
-                statusMsg.innerText = "Nemo is running in Demo Mode... Simulating scan with Google Books!";
+                statusMsg.innerText = "Nemo is running in Demo Mode... Simulating scan with library covers!";
                 
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
                 const demoQueries = [
-                    { query: "Wings of Fire Dragonet Prophecy", color: "#FFDFBA", pattern: "waves", sticker: "🐉" },
-                    { query: "The Bad Guys Aaron Blabey", color: "#BAE1FF", pattern: "stripes", sticker: "🐺" },
-                    { query: "Percy Jackson Lightning Thief", color: "#E8AEFF", pattern: "dots", sticker: "🔱" }
+                    { query: "Wings of Fire Dragonet Prophecy Sutherland", color: "#FBBF24", pattern: "waves", sticker: "🐉" },
+                    { query: "The Bad Guys Aaron Blabey", color: "#60A5FA", pattern: "stripes", sticker: "🐺" },
+                    { query: "Percy Jackson Lightning Thief", color: "#C084FC", pattern: "dots", sticker: "🔱" }
                 ];
 
                 const demoBooks = await Promise.all(demoQueries.map(async (item) => {
@@ -1728,7 +1855,7 @@
 
             statusMsg.innerText = `Nemo is reading the book spines with ${selectedModel}...`;
 
-            const systemPrompt = `You are an expert librarian and OCR reader. Detect every book spine or cover visible in the image. Return a JSON array of objects with fields: "title" (string), "author" (string), "color" (pastel hex like #FFB3BA, #FFDFBA, #FFFFBA, #BAFFC9, #BAE1FF, #E8AEFF), "pattern" (one of: solid, stripes, dots, waves), and "sticker" (one fun emoji). Return ONLY raw JSON without markdown formatting.`;
+            const systemPrompt = `You are an expert librarian and OCR reader. Detect every book spine or cover visible in the image. Return a JSON array of objects with fields: "title" (string), "author" (string), "color" (vibrant bright pastel hex like #F472B6, #FBBF24, #34D399, #60A5FA, #C084FC, #FB7185, #38BDF8), "pattern" (one of: solid, stripes, dots, waves), and "sticker" (one fun emoji). Return ONLY raw JSON without markdown formatting.`;
 
             const promptText = `Find every book in this photo stack. Return a valid JSON array of books.`;
 
@@ -1756,7 +1883,6 @@
                 }
             };
 
-            // Models to attempt: primary selected model, followed by reliable fallbacks
             const modelsToTry = [selectedModel];
             if (selectedModel !== 'gemini-3.5-flash-lite') modelsToTry.push('gemini-3.5-flash-lite');
             if (selectedModel !== 'gemini-2.5-flash') modelsToTry.push('gemini-2.5-flash');
@@ -1795,7 +1921,6 @@
 
                     const result = await response.json();
 
-                    // Extract content from non-thought parts
                     let jsonText = null;
                     const parts = result?.candidates?.[0]?.content?.parts || [];
                     for (const p of parts) {
@@ -1809,20 +1934,22 @@
                     }
 
                     if (jsonText) {
-                        // Clean up markdown block if present
                         jsonText = jsonText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
                         const rawBooks = JSON.parse(jsonText);
-                        statusMsg.innerText = "Fetching official covers from Google Books...";
+                        statusMsg.innerText = "Fetching real covers from online libraries...";
                         
                         const enrichedBooks = await Promise.all(rawBooks.map(async (b) => {
                             const searchQuery = `${b.title} ${b.author || ''}`.trim();
-                            const meta = await fetchGoogleBooksMetadata(searchQuery);
+                            let meta = await fetchGoogleBooksMetadata(searchQuery);
+                            if (!meta || !meta.coverUrl) {
+                                meta = await fetchGoogleBooksMetadata(b.title);
+                            }
                             return {
                                 title: meta?.title || b.title,
                                 author: meta?.author || b.author || "Unknown",
                                 series: b.series || "",
                                 volume: b.volume || "",
-                                color: b.color || "#FFB3BA",
+                                color: b.color || "#F472B6",
                                 pattern: b.pattern || "solid",
                                 sticker: b.sticker || "⭐️",
                                 coverUrl: meta?.coverUrl || null
@@ -1830,7 +1957,7 @@
                         }));
 
                         displayScannedResults(enrichedBooks);
-                        return; // Success!
+                        return;
                     } else {
                         throw new Error("No book records could be extracted from image.");
                     }
@@ -1872,15 +1999,16 @@
                 item.className = "flex items-center justify-between p-2 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100/50 transition";
                 
                 const coverTag = b.coverUrl 
-                    ? `<img src="${b.coverUrl}" class="w-7 h-10 object-cover rounded shadow-sm shrink-0">`
-                    : `<span class="text-lg" style="color: ${b.color}">${b.sticker || '📖'}</span>`;
+                    ? `<img src="${b.coverUrl}" class="w-8 h-12 object-cover rounded shadow-md border border-black/10 shrink-0" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3531/3531540.png'">`
+                    : `<span class="text-xl" style="color: ${b.color}">${b.sticker || '📖'}</span>`;
 
                 item.innerHTML = `
-                    <div class="flex items-center space-x-2 flex-1 min-w-0">
+                    <div class="flex items-center space-x-2.5 flex-1 min-w-0">
                         ${coverTag}
                         <div class="truncate text-left">
-                            <p class="text-xs font-bold text-slate-700 truncate">${b.title}</p>
+                            <p class="text-xs font-bold text-slate-800 truncate">${b.title}</p>
                             <p class="text-[9px] text-slate-400 truncate">By ${b.author || 'Unknown'}</p>
+                            ${b.coverUrl ? '<span class="text-[8px] bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-bold">Real Cover Found</span>' : ''}
                         </div>
                     </div>
                     <input type="checkbox" id="scan-item-${index}" checked class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-400">
@@ -1919,7 +2047,7 @@
                         year: 2026,
                         coverType: b.coverUrl ? 'upload-url' : 'custom',
                         coverData: b.coverUrl || '',
-                        color: b.color || '#E8AEFF',
+                        color: b.color || '#F472B6',
                         pattern: b.pattern || 'solid',
                         sticker: b.sticker || '⭐️',
                         rating: 0,
@@ -1940,7 +2068,7 @@
 
                 triggerSpineCelebration();
                 
-                let msg = `📚 Yay! Added ${addedCount} new books onto your shelves!`;
+                let msg = `📚 Added ${addedCount} books with cover art onto your shelves!`;
                 if (duplicateCount > 0) {
                     msg += ` (Ignored ${duplicateCount} duplicate title${duplicateCount > 1 ? 's' : ''})`;
                 }
@@ -1952,7 +2080,7 @@
             closeScannerModal();
         }
 
-        // Process logs with Gemini + Google Books API Hybrid
+        // Process logs with Gemini + Google Books / Open Library Hybrid
         async function parseExtractedTextWithAI(rawText) {
             const selectedModel = getSelectedGeminiModel();
             toggleImportLoader(true, `Nemo is extracting book names with ${selectedModel}...`);
@@ -1963,15 +2091,15 @@
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
                 let mockQueries = [
-                    { query: "Matilda Roald Dahl", color: "#FFFFBA", pattern: "dots", sticker: "🎒" },
-                    { query: "The Hobbit Tolkien", color: "#BAFFC9", pattern: "waves", sticker: "🐉" },
-                    { query: "Charlottes Web E.B. White", color: "#FFC6FF", pattern: "stripes", sticker: "🕸️" }
+                    { query: "Matilda Roald Dahl", color: "#FBBF24", pattern: "dots", sticker: "🎒" },
+                    { query: "The Hobbit Tolkien", color: "#34D399", pattern: "waves", sticker: "🐉" },
+                    { query: "Charlottes Web E.B. White", color: "#F472B6", pattern: "stripes", sticker: "🕸️" }
                 ];
 
                 if (rawText.toLowerCase().includes("percy") || rawText.toLowerCase().includes("jackson")) {
                     mockQueries = [
-                        { query: "Percy Jackson Lightning Thief Rick Riordan", color: "#BAE1FF", pattern: "waves", sticker: "🔱" },
-                        { query: "Percy Jackson Sea of Monsters Rick Riordan", color: "#BAFFC9", pattern: "stripes", sticker: "🌊" }
+                        { query: "Percy Jackson Lightning Thief Rick Riordan", color: "#60A5FA", pattern: "waves", sticker: "🔱" },
+                        { query: "Percy Jackson Sea of Monsters Rick Riordan", color: "#38BDF8", pattern: "stripes", sticker: "🌊" }
                     ];
                 }
 
@@ -2005,7 +2133,7 @@
             Extract minimal JSON list:
             - title
             - author
-            - color (choose pastel hex like #FFB3BA, #FFDFBA, #FFFFBA, #BAFFC9, #BAE1FF, #E8AEFF, #FFC6FF)
+            - color (choose vibrant pastel hex like #F472B6, #FBBF24, #34D399, #60A5FA, #C084FC, #FB7185, #38BDF8)
             - pattern (choose 'solid', 'stripes', 'dots', or 'waves')
             - sticker (choose emoji like 🦄, 🦖, ⚡, 🚀, 🐶, 🐱, 🌲, 🌸, 🔮, 🍩, 🎨)`;
 
@@ -2056,17 +2184,20 @@
                 if (jsonText) {
                     const rawBooks = JSON.parse(jsonText);
                     
-                    toggleImportLoader(true, "Fetching official covers from Google Books API...");
+                    toggleImportLoader(true, "Fetching official covers from online libraries...");
                     
                     const enrichedBooks = await Promise.all(rawBooks.map(async (b) => {
                         const searchQuery = `${b.title} ${b.author || ''}`.trim();
-                        const meta = await fetchGoogleBooksMetadata(searchQuery);
+                        let meta = await fetchGoogleBooksMetadata(searchQuery);
+                        if (!meta || !meta.coverUrl) {
+                            meta = await fetchGoogleBooksMetadata(b.title);
+                        }
                         return {
                             title: meta?.title || b.title,
                             author: meta?.author || b.author || "Unknown",
                             series: b.series || "",
                             volume: b.volume || "",
-                            color: b.color || "#BAF9FF",
+                            color: b.color || "#60A5FA",
                             pattern: b.pattern || "solid",
                             sticker: b.sticker || "⭐️",
                             coverUrl: meta?.coverUrl || null
@@ -2103,15 +2234,16 @@
                 item.className = "flex items-center justify-between p-2 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100/50 transition";
                 
                 const coverTag = b.coverUrl 
-                    ? `<img src="${b.coverUrl}" class="w-7 h-10 object-cover rounded shadow-sm shrink-0">`
-                    : `<span class="text-lg" style="color: ${b.color}">${b.sticker || '📖'}</span>`;
+                    ? `<img src="${b.coverUrl}" class="w-8 h-12 object-cover rounded shadow-md border border-black/10 shrink-0" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3531/3531540.png'">`
+                    : `<span class="text-xl" style="color: ${b.color}">${b.sticker || '📖'}</span>`;
 
                 item.innerHTML = `
-                    <div class="flex items-center space-x-2 flex-1 min-w-0">
+                    <div class="flex items-center space-x-2.5 flex-1 min-w-0">
                         ${coverTag}
                         <div class="truncate text-left">
-                            <p class="text-xs font-bold text-slate-700 truncate">${b.title}</p>
+                            <p class="text-xs font-bold text-slate-800 truncate">${b.title}</p>
                             <p class="text-[9px] text-slate-400 truncate">By ${b.author || 'Unknown'}</p>
+                            ${b.coverUrl ? '<span class="text-[8px] bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-bold">Real Cover Found</span>' : ''}
                         </div>
                     </div>
                     <input type="checkbox" id="import-item-${index}" checked class="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-400">
@@ -2149,7 +2281,7 @@
                         year: 2026,
                         coverType: b.coverUrl ? 'upload-url' : 'custom',
                         coverData: b.coverUrl || '',
-                        color: b.color || '#BAF9FF',
+                        color: b.color || '#60A5FA',
                         pattern: b.pattern || 'solid',
                         sticker: b.sticker || '⭐️',
                         rating: 0,
@@ -2284,9 +2416,20 @@
 
             const spinePreview = document.getElementById("detail-spine-preview");
             if (spinePreview) {
-                spinePreview.style.backgroundColor = book.color || '#FFB3BA';
+                spinePreview.style.backgroundColor = book.color || '#F472B6';
                 spinePreview.className = "w-14 h-24 rounded-lg flex flex-col items-center justify-between p-2 shadow-md relative overflow-hidden border border-black/10 shrink-0";
-                if (book.pattern && book.pattern !== 'solid') {
+                
+                // Clear any old inner cover images
+                const existingCoverImg = spinePreview.querySelector('.drawer-spine-cover');
+                if (existingCoverImg) existingCoverImg.remove();
+
+                if (book.coverType === 'upload-url' && book.coverData) {
+                    const img = document.createElement('img');
+                    img.src = book.coverData;
+                    img.className = 'drawer-spine-cover absolute inset-0 w-full h-full object-cover object-left opacity-90 z-0 pointer-events-none';
+                    img.onerror = () => img.remove();
+                    spinePreview.prepend(img);
+                } else if (book.pattern && book.pattern !== 'solid') {
                     spinePreview.classList.add(`pattern-${book.pattern}`);
                 }
             }
@@ -2304,11 +2447,12 @@
                         </div>
                     `;
                 } else if (book.coverType === 'upload-url' && book.coverData) {
-                    coverVisual.style.background = `url('${book.coverData}')`;
-                    coverVisual.style.backgroundSize = "cover";
-                    coverVisual.style.backgroundPosition = "center";
+                    coverVisual.style.background = '#f1f5f9';
+                    coverVisual.innerHTML = `
+                        <img src="${book.coverData}" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'flex flex-col items-center justify-center h-full p-1 text-center\\'>📖<span class=\\'text-[8px] font-bold mt-1 text-slate-700 truncate w-full\\'>${book.title.replace(/'/g, "\\'")}</span></div>';">
+                    `;
                 } else {
-                    coverVisual.style.background = book.color || '#FFB3BA';
+                    coverVisual.style.background = book.color || '#F472B6';
                     coverVisual.innerHTML = `
                         <div class="absolute inset-1.5 border border-black/10 rounded flex flex-col justify-between p-1 text-center">
                             <span class="text-xl">${book.sticker || '⭐'}</span>
