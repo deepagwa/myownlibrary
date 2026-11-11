@@ -1,4 +1,4 @@
-const CACHE_NAME = 'myownlibrary-v5';
+const CACHE_NAME = 'myownlibrary-v8';
 const ASSETS_TO_CACHE = [
   './manifest.json',
   './icon.svg'
@@ -32,8 +32,10 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Never intercept or cache API endpoints
+  // Never intercept or cache external image / API endpoints
   if (url.hostname.includes('googleapis.com') || 
+      url.hostname.includes('openlibrary.org') || 
+      url.hostname.includes('flaticon.com') || 
       url.hostname.includes('allorigins') || 
       url.origin !== self.location.origin) {
     return;
