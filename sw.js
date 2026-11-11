@@ -1,6 +1,7 @@
-const CACHE_NAME = 'myownlibrary-v3';
+const CACHE_NAME = 'myownlibrary-v5';
 const ASSETS_TO_CACHE = [
-  './manifest.json'
+  './manifest.json',
+  './icon.svg'
 ];
 
 self.addEventListener('install', (event) => {
