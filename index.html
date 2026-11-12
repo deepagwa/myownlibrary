@@ -31,10 +31,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
     <style>
+        :root {
+            --sat: env(safe-area-inset-top, 0px);
+            --sab: env(safe-area-inset-bottom, 0px);
+        }
+
         body {
             font-family: 'Fredoka', 'Inter', sans-serif;
-            background: radial-gradient(circle, #eefcfd 0%, #d5f3f8 100%);
-            overscroll-behavior-y: contain; /* Prevents pull-to-refresh on mobile browsers */
+            background: #eddcc6; /* Base background matches warm wood shelves */
+            overscroll-behavior-y: contain;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -101,9 +106,11 @@
             border-bottom: 4px solid #4a2c13;
         }
 
+        /* Seamless repeating wood-slat background pattern */
         .shelf-back {
-            background: #eddcc6;
-            background-image: repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(160,110,70,0.06) 38px, rgba(160,110,70,0.06) 40px);
+            background-color: #eddcc6;
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(160,110,70,0.09) 38px, rgba(160,110,70,0.09) 40px);
+            background-repeat: repeat;
         }
 
         /* Writing Mode for Spine Titles */
@@ -122,24 +129,29 @@
         .scan-bar {
             animation: scan-glow 2s infinite linear;
         }
+
+        /* Pixel Android Safe Navigation Bar Inset */
+        .safe-bottom-nav {
+            padding-bottom: max(1.2rem, calc(var(--sab) + 0.6rem));
+        }
     </style>
 </head>
-<body class="w-full h-screen bg-sky-50 flex flex-col overflow-hidden">
+<body class="w-full h-[100dvh] flex flex-col overflow-hidden bg-[#eddcc6]">
 
-    <!-- PWA Main Container Viewport -->
+    <!-- PWA Main Flex Container Viewport -->
     <div class="w-full h-full flex flex-col relative overflow-hidden">
 
         <!-- Toast Notifications (Direct user actions only) -->
-        <div id="toast-notification" class="hidden absolute top-4 left-4 right-4 bg-teal-500 text-white rounded-2xl p-3 shadow-xl z-50 transition-all duration-300 flex items-center space-x-3 border-2 border-white">
+        <div id="toast-notification" class="hidden fixed top-4 left-4 right-4 bg-teal-500 text-white rounded-2xl p-3 shadow-2xl z-50 transition-all duration-300 flex items-center space-x-3 border-2 border-white">
             <span id="toast-emoji" class="text-2xl">🌟</span>
             <p id="toast-text" class="text-sm font-semibold leading-snug flex-1"></p>
         </div>
 
-        <!-- Main Scrollable Screen Area with generous bottom padding so the last shelf is never clipped -->
-        <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col bg-amber-50/20 pb-40">
+        <!-- MAIN SCROLLABLE AREA: Full continuous wood background from top to bottom -->
+        <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col shelf-back w-full">
 
             <!-- App Header & Mascot (Nemo the Bookworm) -->
-            <div class="p-4 bg-gradient-to-b from-teal-400 to-emerald-400 text-white rounded-b-[2.5rem] shadow-md relative pb-6">
+            <div class="p-4 bg-gradient-to-b from-teal-400 to-emerald-400 text-white rounded-b-[2.5rem] shadow-md relative pb-6 shrink-0 z-10">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center space-x-2">
                         <div class="p-2 bg-white/20 rounded-xl">
@@ -172,18 +184,18 @@
             </div>
 
             <!-- Dashboard Stats Cards -->
-            <div class="px-4 -mt-3 relative z-10 grid grid-cols-3 gap-2">
-                <div class="bg-white p-2.5 rounded-2xl shadow-md border border-teal-100 text-center">
+            <div class="px-4 -mt-3 relative z-10 grid grid-cols-3 gap-2 shrink-0">
+                <div class="bg-white/95 backdrop-blur-sm p-2.5 rounded-2xl shadow-md border border-teal-100 text-center">
                     <p class="text-slate-400 text-[10px] uppercase font-bold">Read</p>
                     <p id="stat-read" class="text-xl font-black text-emerald-500">0</p>
                     <p class="text-[9px] text-slate-500">Completed ✅</p>
                 </div>
-                <div class="bg-white p-2.5 rounded-2xl shadow-md border border-teal-100 text-center">
+                <div class="bg-white/95 backdrop-blur-sm p-2.5 rounded-2xl shadow-md border border-teal-100 text-center">
                     <p class="text-slate-400 text-[10px] uppercase font-bold">Reading</p>
                     <p id="stat-reading" class="text-xl font-black text-amber-500">0</p>
                     <p class="text-[9px] text-slate-500">In Progress 📖</p>
                 </div>
-                <div class="bg-white p-2.5 rounded-2xl shadow-md border border-teal-100 text-center">
+                <div class="bg-white/95 backdrop-blur-sm p-2.5 rounded-2xl shadow-md border border-teal-100 text-center">
                     <p class="text-slate-400 text-[10px] uppercase font-bold">Total</p>
                     <p id="stat-total" class="text-xl font-black text-indigo-500">0</p>
                     <p class="text-[9px] text-slate-500">On Shelves 📚</p>
@@ -191,67 +203,65 @@
             </div>
 
             <!-- Monthly Chart & Book Count Breakdown -->
-            <div class="mx-4 mt-4 bg-white p-3 rounded-2xl border border-indigo-100 shadow-sm">
+            <div class="mx-4 mt-4 bg-white/95 backdrop-blur-sm p-3 rounded-2xl border border-indigo-100 shadow-sm shrink-0">
                 <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
                     <span>📊 Monthly reading adventure</span>
                     <span id="chart-current-year" class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">2026</span>
                 </h3>
                 
                 <!-- Books Count Bar Graph -->
-                <div class="flex items-end justify-between h-20 pt-2 px-1 bg-slate-50 rounded-xl" id="monthly-chart-container">
-                    <!-- Dynamic book towers generate here -->
-                </div>
+                <div class="flex items-end justify-between h-20 pt-2 px-1 bg-slate-50/80 rounded-xl" id="monthly-chart-container"></div>
                 <div class="flex justify-between text-[9px] font-bold text-slate-400 mt-1 px-1">
                     <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
                 </div>
             </div>
 
             <!-- Search and Filter Controls -->
-            <div class="px-4 mt-4">
-                <div class="flex items-center bg-white rounded-2xl border border-slate-200 px-3 py-1.5 shadow-sm">
+            <div class="px-4 mt-4 shrink-0">
+                <div class="flex items-center bg-white/95 backdrop-blur-sm rounded-2xl border border-amber-200/80 px-3 py-2 shadow-sm">
                     <i class="fa-solid fa-magnifying-glass text-slate-400 mr-2"></i>
                     <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Search title, author..." class="bg-transparent text-sm w-full outline-none text-slate-700">
                 </div>
 
                 <!-- Organization Filters -->
                 <div class="flex items-center justify-between mt-3 space-x-1.5 overflow-x-auto no-scrollbar py-1">
-                    <button id="btn-group-author" onclick="setGrouping('author')" class="group-btn-active bg-teal-500 text-white text-[11px] px-3 py-1.5 rounded-full font-bold shadow-sm shrink-0">By Author</button>
-                    <button id="btn-group-series" onclick="setGrouping('series')" class="group-btn bg-slate-100 text-slate-600 hover:bg-slate-200 text-[11px] px-3 py-1.5 rounded-full font-bold shrink-0">By Series</button>
-                    <button id="btn-group-title" onclick="setGrouping('title')" class="group-btn bg-slate-100 text-slate-600 hover:bg-slate-200 text-[11px] px-3 py-1.5 rounded-full font-bold shrink-0">By Title</button>
-                    <button id="btn-group-status" onclick="setGrouping('status')" class="group-btn bg-slate-100 text-slate-600 hover:bg-slate-200 text-[11px] px-3 py-1.5 rounded-full font-bold shrink-0">By Status</button>
+                    <button id="btn-group-author" onclick="setGrouping('author')" class="group-btn-active bg-teal-500 text-white text-[11px] px-3.5 py-1.5 rounded-full font-bold shadow-sm shrink-0">By Author</button>
+                    <button id="btn-group-series" onclick="setGrouping('series')" class="group-btn bg-white/90 text-slate-700 hover:bg-white text-[11px] px-3.5 py-1.5 rounded-full font-bold shrink-0 shadow-sm">By Series</button>
+                    <button id="btn-group-title" onclick="setGrouping('title')" class="group-btn bg-white/90 text-slate-700 hover:bg-white text-[11px] px-3.5 py-1.5 rounded-full font-bold shrink-0 shadow-sm">By Title</button>
+                    <button id="btn-group-status" onclick="setGrouping('status')" class="group-btn bg-white/90 text-slate-700 hover:bg-white text-[11px] px-3.5 py-1.5 rounded-full font-bold shrink-0 shadow-sm">By Status</button>
                 </div>
             </div>
 
-            <!-- Dynamic Graphical Wooden Library Shelf Area with generous padding for full visibility -->
-            <div id="library-shelves-container" class="mt-4 px-3 pb-20 shelf-back min-h-[450px] flex-1">
-                <!-- All shelves dynamically populate here and scroll smoothly without cutting off -->
+            <!-- Dynamic Graphical Wooden Library Shelf Area (wood pattern repeats continuously without cuts) -->
+            <div id="library-shelves-container" class="mt-4 px-3 w-full">
+                <!-- All shelves dynamically populate here -->
             </div>
 
         </div>
 
-        <!-- Bottom Nav Bar with Direct Camera Quick Action -->
-        <div class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-4 flex items-center justify-around border-t border-slate-100 z-40 pb-6">
-            <button onclick="scrollToTop()" class="flex flex-col items-center text-slate-500 hover:text-teal-500 transition">
+        <!-- Floating Bottom Nav Bar with Pixel Safe Area Padding -->
+        <div class="w-full bg-white/95 backdrop-blur-md px-4 pt-2.5 safe-bottom-nav flex items-center justify-around border-t border-amber-200/50 shadow-2xl z-40 shrink-0">
+            <button onclick="scrollToTop()" class="flex flex-col items-center text-slate-500 hover:text-teal-500 active:scale-95 transition">
                 <i class="fa-solid fa-house-user text-xl"></i>
-                <span class="text-[9px] font-bold mt-1">My Library</span>
+                <span class="text-[10px] font-bold mt-1">My Library</span>
             </button>
             
             <!-- Direct Quick Camera Snap Action for Pixel / Android -->
             <button onclick="openLiveCamera()" class="flex flex-col items-center text-amber-500 hover:text-amber-600 active:scale-95 transition" title="Snap Photo with Camera">
-                <div class="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shadow-sm">
-                    <i class="fa-solid fa-camera text-base"></i>
+                <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shadow-sm">
+                    <i class="fa-solid fa-camera text-lg"></i>
                 </div>
-                <span class="text-[9px] font-bold mt-0.5">Snap Stack</span>
+                <span class="text-[10px] font-bold mt-0.5">Snap Stack</span>
             </button>
 
             <!-- Glowing '+' Button triggers the unified adventure option menu -->
-            <button onclick="openAddHubModal()" class="w-14 h-14 bg-gradient-to-tr from-teal-400 to-emerald-400 text-white rounded-full flex items-center justify-center shadow-xl transform -translate-y-5 border-4 border-white hover:scale-110 active:scale-95 transition animate-pulse duration-1000" title="Add New Adventure">
+            <button onclick="openAddHubModal()" class="w-14 h-14 bg-gradient-to-tr from-teal-400 to-emerald-400 text-white rounded-full flex items-center justify-center shadow-xl transform -translate-y-4 border-4 border-white hover:scale-110 active:scale-95 transition animate-pulse duration-1000" title="Add New Adventure">
                 <i class="fa-solid fa-plus text-2xl font-black"></i>
             </button>
 
-            <button onclick="openSettingsModal()" class="flex flex-col items-center text-slate-500 hover:text-indigo-500 transition" title="Parent Settings Gate">
+            <button onclick="openSettingsModal()" class="flex flex-col items-center text-slate-500 hover:text-indigo-500 active:scale-95 transition" title="Parent Settings Gate">
                 <i class="fa-solid fa-gear text-xl"></i>
-                <span class="text-[9px] font-bold mt-1">Parents</span>
+                <span class="text-[10px] font-bold mt-1">Parents</span>
             </button>
         </div>
 
@@ -320,9 +330,7 @@
                 </div>
 
                 <!-- Dynamic Gemini API Setup Alert Panel -->
-                <div id="add-hub-key-alert" class="transition-all duration-300">
-                    <!-- Configured dynamically inside JavaScript -->
-                </div>
+                <div id="add-hub-key-alert" class="transition-all duration-300"></div>
             </div>
         </div>
     </div>
@@ -392,9 +400,7 @@
                 <!-- Detected Books Interactive Checklist -->
                 <div id="scan-results-wrapper" class="hidden w-full mt-4 border-t border-slate-100 pt-3">
                     <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Identified books in your stack:</h4>
-                    <div id="scan-books-list" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
-                        <!-- Checklist populates dynamically -->
-                    </div>
+                    <div id="scan-books-list" class="space-y-1.5 max-h-36 overflow-y-auto pr-1"></div>
 
                     <button onclick="addAllVerifiedScannedBooks()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-black py-2.5 rounded-2xl text-xs mt-3 shadow-md flex items-center justify-center space-x-1.5 transition">
                         <i class="fa-solid fa-sparkles"></i>
@@ -498,13 +504,13 @@
                         <div class="flex-1 space-y-2">
                             <!-- Color select picker row -->
                             <div class="flex space-x-1.5 overflow-x-auto py-0.5 no-scrollbar">
-                                <span onclick="setSpineColor('#FFB3BA')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #FFB3BA;"></span>
-                                <span onclick="setSpineColor('#FFDFBA')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #FFDFBA;"></span>
-                                <span onclick="setSpineColor('#FFFFBA')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #FFFFBA;"></span>
-                                <span onclick="setSpineColor('#BAFFC9')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #BAFFC9;"></span>
-                                <span onclick="setSpineColor('#BAE1FF')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #BAE1FF;"></span>
-                                <span onclick="setSpineColor('#E8AEFF')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #E8AEFF;"></span>
-                                <span onclick="setSpineColor('#FFC6FF')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #FFC6FF;"></span>
+                                <span onclick="setSpineColor('#F472B6')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #F472B6;"></span>
+                                <span onclick="setSpineColor('#FBBF24')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #FBBF24;"></span>
+                                <span onclick="setSpineColor('#34D399')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #34D399;"></span>
+                                <span onclick="setSpineColor('#60A5FA')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #60A5FA;"></span>
+                                <span onclick="setSpineColor('#C084FC')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #C084FC;"></span>
+                                <span onclick="setSpineColor('#FB7185')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #FB7185;"></span>
+                                <span onclick="setSpineColor('#38BDF8')" class="w-5 h-5 rounded-full border border-black/10 cursor-pointer block shrink-0" style="background-color: #38BDF8;"></span>
                             </div>
                             <!-- Pattern select -->
                             <div class="grid grid-cols-3 gap-1">
@@ -688,9 +694,7 @@
                 <!-- Bulk Detected Results Interactive Checklist -->
                 <div id="import-results-wrapper" class="hidden w-full border-t border-slate-100 pt-3">
                     <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Identified books to load:</h4>
-                    <div id="import-books-list" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
-                        <!-- Checklist fills dynamically -->
-                    </div>
+                    <div id="import-books-list" class="space-y-1.5 max-h-36 overflow-y-auto pr-1"></div>
 
                     <button onclick="addAllVerifiedImportedBooks()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-black py-2.5 rounded-2xl text-xs mt-3 shadow-md flex items-center justify-center space-x-1.5 transition">
                         <i class="fa-solid fa-book-sparkles"></i>
@@ -743,9 +747,7 @@
                 </div>
 
                 <!-- Custom Front Cover Art Visualizer -->
-                <div id="detail-cover-visual" class="w-16 h-24 rounded-lg border border-black/10 bg-slate-100 shadow-md relative overflow-hidden shrink-0 flex items-center justify-center">
-                    <!-- Loaded dynamically in JS -->
-                </div>
+                <div id="detail-cover-visual" class="w-16 h-24 rounded-lg border border-black/10 bg-slate-100 shadow-md relative overflow-hidden shrink-0 flex items-center justify-center"></div>
 
                 <!-- Quick Actions Drawer -->
                 <div class="flex-1 space-y-1.5">
@@ -772,9 +774,7 @@
                         <i class="fa-solid fa-star"></i>
                     </div>
                 </div>
-                <div class="flex items-center space-x-1" id="detail-rating-picker-stars">
-                    <!-- Handled in JS -->
-                </div>
+                <div class="flex items-center space-x-1" id="detail-rating-picker-stars"></div>
             </div>
 
         </div>
@@ -784,16 +784,14 @@
         // PDF.js worker setup
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // Helper to retrieve user selected Gemini model
         function getSelectedGeminiModel() {
             return localStorage.getItem('myown_gemini_model') || 'gemini-3.8-flash';
         }
 
-        // Clean query text helper
         function cleanBookQuery(text) {
             if (!text) return "";
             return text
-                .replace(/[:\-–—]\s*.+$/, '') // strip subtitles after colon or dash
+                .replace(/[:\-–—]\s*.+$/, '')
                 .replace(/[()]/g, ' ')
                 .replace(/\b(vol|volume|book|no|part)\.?\s*\d+\b/gi, ' ')
                 .replace(/\s+/g, ' ')
@@ -805,7 +803,6 @@
             if (!query) return null;
             const cleaned = cleanBookQuery(query);
 
-            // 1. First attempt: Google Books API
             try {
                 const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(cleaned)}&maxResults=1`);
                 if (res.ok) {
@@ -833,7 +830,6 @@
                 console.warn("Google Books API query failed:", cleaned, e);
             }
 
-            // 2. Second attempt: Open Library Search API (Reliable open cover CDN)
             try {
                 const olRes = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(cleaned)}&limit=1`);
                 if (olRes.ok) {
@@ -857,7 +853,6 @@
             return null;
         }
 
-        // Manual Entry Auto-Fill with Google Books / Open Library (0 AI tokens)
         async function autoFillFromGoogleBooks() {
             const titleInput = document.getElementById("add-title");
             const query = titleInput.value.trim();
@@ -883,7 +878,6 @@
             }
         }
 
-        // Allow user to fetch / refresh real cover art for existing books in the drawer
         async function refreshCoverFromGoogleBooks() {
             if (!state.activeBookId) return;
             const book = state.books.find(b => b.id === state.activeBookId);
@@ -894,7 +888,6 @@
 
             showNemoMessage("Searching Google Books & Open Library...", "⏳");
             
-            // Try with title + author, then fallback to title alone
             let query = `${book.title} ${book.author || ''}`.trim();
             let meta = await fetchGoogleBooksMetadata(query);
             if (!meta || !meta.coverUrl) {
@@ -916,7 +909,6 @@
             }
         }
 
-        // Default cover mapping details
         const PRESET_COVER_MAP = {
             unicorn: { bg: 'linear-gradient(135deg, #FFC6FF 0%, #D8B4F8 100%)', emoji: '🦄' },
             dragon: { bg: 'linear-gradient(135deg, #FF9E9E 0%, #FF5252 100%)', emoji: '🐉' },
@@ -925,7 +917,6 @@
             jungle: { bg: 'linear-gradient(135deg, #99FF99 0%, #2EB82E 100%)', emoji: '🦁' }
         };
 
-        // Application Global State
         const state = {
             appId: typeof __app_id !== 'undefined' ? __app_id : 'myown-library-app',
             books: [],
@@ -945,7 +936,6 @@
             extractedPDFText: ""
         };
 
-        // Safe Base64 Image Compression to fit LocalStorage limits
         function compressImage(base64Str, maxWidth = 100, maxHeight = 150) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -976,7 +966,6 @@
             });
         }
 
-        // Fast high-definition image compressor optimized for Gemini Vision API payload
         function prepareImageForGemini(dataUrl, maxDim = 900) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -1017,17 +1006,14 @@
             });
         }
 
-        // Initialize App
         window.onload = function() {
             registerServiceWorker();
             loadBooksFromStorage();
             updateHeaderModelBadge();
             renderApp();
-            // Automatically upgrade seeded books with real cover images
             upgradeInitialBooksWithCovers();
         };
 
-        // Service Worker registration helper for PWA
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('./sw.js').catch(err => {
@@ -1036,11 +1022,9 @@
             }
         }
 
-        // Seamlessly upgrades any books without real cover art by querying online databases
         async function upgradeInitialBooksWithCovers() {
             let updated = false;
             for (const book of state.books) {
-                // If cover is missing or using an older unreachable URL, refresh it
                 if (!book.coverData || book.coverType !== 'upload-url' || book.coverData.includes('http:')) {
                     const meta = await fetchGoogleBooksMetadata(`${book.title} ${book.author}`);
                     if (meta && meta.coverUrl) {
@@ -1056,7 +1040,6 @@
             }
         }
 
-        // Export Library to JSON file (for moving to another Pixel / Device)
         function exportLibraryData() {
             try {
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.books, null, 2));
@@ -1073,7 +1056,6 @@
             }
         }
 
-        // Restore Library from JSON file
         function importLibraryData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1108,7 +1090,6 @@
             }
         }
 
-        // Load data safely
         function loadBooksFromStorage() {
             try {
                 let raw = localStorage.getItem('myown_library_books');
@@ -1123,7 +1104,6 @@
                 if (raw) {
                     state.books = JSON.parse(raw);
                 } else {
-                    // Seed initial child books with reliable Open Library / HTTPS Google covers and vibrant colors
                     state.books = [
                         {
                             id: 'book1',
@@ -1136,7 +1116,7 @@
                             year: 2026,
                             coverType: 'upload-url',
                             coverData: 'https://covers.openlibrary.org/b/id/10521270-M.jpg',
-                            color: '#F472B6', // Vibrant Rose Pink
+                            color: '#F472B6',
                             pattern: 'stripes',
                             sticker: '⚡',
                             rating: 5,
@@ -1153,7 +1133,7 @@
                             year: 2026,
                             coverType: 'upload-url',
                             coverData: 'https://covers.openlibrary.org/b/id/13247018-M.jpg',
-                            color: '#FBBF24', // Vibrant Amber Gold
+                            color: '#FBBF24',
                             pattern: 'dots',
                             sticker: '🐶',
                             rating: 4,
@@ -1170,7 +1150,7 @@
                             year: 2026,
                             coverType: 'upload-url',
                             coverData: 'https://covers.openlibrary.org/b/id/8235111-M.jpg',
-                            color: '#60A5FA', // Vibrant Sky Blue
+                            color: '#60A5FA',
                             pattern: 'waves',
                             sticker: '🔱',
                             rating: 5,
@@ -1184,12 +1164,11 @@
             }
         }
 
-        // Save data to storage safely with fallback error handler
         function saveToStorage() {
             try {
                 localStorage.setItem('myown_library_books', JSON.stringify(state.books));
             } catch(e) {
-                console.error("Quota Exceeded Error, cleaning custom base64 cover items", e);
+                console.error("Quota Exceeded Error", e);
                 state.books.forEach(b => {
                     if (b.coverType === 'upload-url' && b.coverData && b.coverData.startsWith('data:')) {
                         b.coverType = 'custom';
@@ -1200,12 +1179,11 @@
                     localStorage.setItem('myown_library_books', JSON.stringify(state.books));
                     showNemoMessage("🧹 Nemo cleaned old scan cache to fit your books safely!");
                 } catch(deepErr) {
-                    showNemoMessage("⚠️ Memory is completely full! Try removing some old books.");
+                    showNemoMessage("⚠️ Memory is full! Try removing some old books.");
                 }
             }
         }
 
-        // Interactive toast system for direct actions
         function showNemoMessage(msg, emoji = '🐛') {
             const container = document.getElementById("toast-notification");
             const text = document.getElementById("toast-text");
@@ -1225,14 +1203,12 @@
             }
         }
 
-        // Main Rendering pipeline
         function renderApp() {
             calculateStats();
             renderMonthlyChart();
             renderBookshelf();
         }
 
-        // Basic Stats Counter
         function calculateStats() {
             const readCount = state.books.filter(b => b.status === 'read').length;
             const readingCount = state.books.filter(b => b.status === 'reading').length;
@@ -1243,7 +1219,6 @@
             document.getElementById("stat-total").innerText = totalCount;
         }
 
-        // Dynamic Book Tower Bar Chart
         function renderMonthlyChart() {
             const container = document.getElementById("monthly-chart-container");
             if (!container) return;
@@ -1291,7 +1266,7 @@
             });
         }
 
-        // Physical shelf layout compiler with VIBRANT SPINES & RELIABLE COVER ART
+        // Physical shelf layout compiler with full seamless scroll & height
         function renderBookshelf() {
             const container = document.getElementById("library-shelves-container");
             if (!container) return;
@@ -1334,23 +1309,21 @@
             const groupKeys = Object.keys(groups);
             if (groupKeys.length === 0 || filtered.length === 0) {
                 container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-16 text-slate-400">
+                    <div class="flex flex-col items-center justify-center py-16 text-slate-500">
                         <span class="text-4xl mb-2">🔍</span>
                         <p class="text-sm font-bold">No books found here!</p>
-                        <p class="text-[10px] text-slate-400">Try searching another adventure name</p>
+                        <p class="text-[10px] text-slate-500">Try searching another adventure name</p>
                     </div>
                 `;
                 return;
             }
 
-            groupKeys.forEach((groupName, groupIdx) => {
+            groupKeys.forEach((groupName) => {
                 const shelfBooks = groups[groupName];
                 if (!shelfBooks || shelfBooks.length === 0) return;
 
                 const shelfWrapper = document.createElement("div");
-                // Last shelf gets extra padding-bottom so it clears the floating bottom dock completely
-                const isLast = (groupIdx === groupKeys.length - 1);
-                shelfWrapper.className = `relative pt-7 flex flex-col ${isLast ? 'mb-16' : 'mb-9'}`;
+                shelfWrapper.className = `relative pt-7 flex flex-col mb-10 w-full`;
 
                 const nameplate = document.createElement("div");
                 nameplate.className = "absolute top-0 left-2 bg-[#ffdfba] text-[#5c3a21] border border-[#d2a679] shadow-sm rounded-md px-3 py-0.5 text-[9px] font-black uppercase tracking-wider z-10 flex items-center space-x-1";
@@ -1374,18 +1347,15 @@
 
                     const hasCoverImage = book.coverType === 'upload-url' && book.coverData && book.coverData.length > 5;
                     
-                    // Render spine with solid vibrant color base + crisp 3D sheen overlay
                     bookSpine.className = `book-spine-item ${patternClass} w-7 h-28 rounded-t-md flex flex-col items-center justify-between py-2 text-center font-bold relative border-r border-black/20 shrink-0 cursor-pointer overflow-hidden`;
                     bookSpine.style.backgroundColor = spineColor;
                     bookSpine.style.transform = `rotate(${book.tilt}deg)`;
                     bookSpine.setAttribute("onclick", `openBookDrawer('${book.id}')`);
 
-                    // Embedded cover background with graceful fallback if the image fails to load
                     const coverImgHtml = hasCoverImage ? `
                         <img src="${book.coverData}" alt="cover" class="absolute inset-0 w-full h-full object-cover object-left opacity-90 z-0 pointer-events-none" onerror="this.style.display='none'">
                     ` : '';
 
-                    // Vibrant, readable pill for spine titles (no murky dark blocks)
                     const titleBadgeHtml = hasCoverImage
                         ? `<span class="vertical-spine-text bg-amber-50/90 text-amber-950 font-black border border-amber-300/80 shadow-sm px-0.5 py-1 rounded text-[8px] tracking-tight uppercase leading-tight line-clamp-1 truncate max-h-[62px] w-full text-center relative z-20">${book.title}</span>`
                         : `<span class="vertical-spine-text text-slate-900 font-black text-[8.5px] tracking-tight uppercase leading-tight line-clamp-1 truncate max-h-[62px] w-full text-center relative z-20" style="text-shadow: 0 1px 2px rgba(255,255,255,0.85);">${book.title}</span>`;
@@ -1396,16 +1366,9 @@
 
                     bookSpine.innerHTML = `
                         ${coverImgHtml}
-                        <!-- Photorealistic Translucent 3D Sheen Highlight (Lets color and art pop through!) -->
                         <div class="spine-3d-sheen absolute inset-0 z-10"></div>
-
-                        <!-- Tiny sticker tag / bookmark crest -->
                         <span class="text-[11px] filter drop-shadow select-none relative z-20">${book.sticker || '⭐'}</span>
-                        
-                        <!-- Book title in vertical direction with vibrant readable pill -->
                         ${titleBadgeHtml}
-                        
-                        <!-- Vol signifier if available -->
                         ${volBadgeHtml}
                     `;
 
@@ -1419,19 +1382,23 @@
                 shelfWrapper.appendChild(woodBoard);
                 container.appendChild(shelfWrapper);
             });
+
+            // Generous bottom spacer so the lowest shelf scrolls fully clear of the bottom navigation dock
+            const bottomSpacer = document.createElement("div");
+            bottomSpacer.className = "h-44 w-full shrink-0 pointer-events-none";
+            container.appendChild(bottomSpacer);
         }
 
-        // Filter actions
         function setGrouping(mode) {
             state.groupingMode = mode;
             
             document.querySelectorAll(".group-btn-active").forEach(btn => {
-                btn.className = "group-btn bg-slate-100 text-slate-600 hover:bg-slate-200 text-[11px] px-3 py-1.5 rounded-full font-bold shrink-0";
+                btn.className = "group-btn bg-white/90 text-slate-700 hover:bg-white text-[11px] px-3.5 py-1.5 rounded-full font-bold shrink-0 shadow-sm";
             });
 
             const activeBtn = document.getElementById(`btn-group-${mode}`);
             if (activeBtn) {
-                activeBtn.className = "group-btn-active bg-teal-500 text-white text-[11px] px-3 py-1.5 rounded-full font-bold shadow-sm shrink-0";
+                activeBtn.className = "group-btn-active bg-teal-500 text-white text-[11px] px-3.5 py-1.5 rounded-full font-bold shadow-sm shrink-0";
             }
 
             renderApp();
@@ -1449,7 +1416,6 @@
             document.querySelector('.overflow-y-auto').scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Direct Camera Launcher from Nav or Add Hub
         function openLiveCamera() {
             openScannerModal();
             triggerDirectCameraCapture();
@@ -1462,7 +1428,6 @@
             }
         }
 
-        // Magic Add Hub Modal Navigation
         function openAddHubModal() {
             updateHubKeyStatus();
             document.getElementById("add-hub-modal").classList.remove("hidden");
@@ -1524,7 +1489,6 @@
             }
         }
 
-        // Modal triggers
         function openAddBookModal() {
             document.getElementById("manual-add-form").reset();
             state.coverUploadBase64 = null;
@@ -1581,7 +1545,6 @@
             document.getElementById("scanner-modal").classList.add("hidden");
         }
 
-        /* ------------------ Magic Bulk Importer Handlers ------------------ */
         function openBulkImportModal() {
             document.getElementById("import-pasted-text").value = "";
             document.getElementById("import-gdoc-url").value = "";
@@ -1628,7 +1591,6 @@
             }
         }
 
-        // Process PDF client-side text extraction
         async function processPDFFile(event) {
             const file = event.target.files[0];
             const statusEl = document.getElementById("import-pdf-status");
@@ -1656,7 +1618,6 @@
             }
         }
 
-        // Unified Trigger for processing bulk extracted text
         async function triggerBulkImportProcess() {
             let rawTextToParse = "";
 
@@ -1720,7 +1681,6 @@
             }
         }
 
-        // Custom Spine Customization Preview sandbox sync
         function setSpineColor(color) {
             state.spineCustomization.color = color;
             updateSpinePreview();
@@ -1759,7 +1719,6 @@
             }
         }
 
-        // Compress manually uploaded book cover to avoid storage overflow
         async function compressBookCover(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1780,7 +1739,6 @@
             reader.readAsDataURL(file);
         }
 
-        // Processing stack photo using Gemini multimodal AI scanner
         async function processFileForScan(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1802,7 +1760,6 @@
                 imgEl.src = e.target.result;
 
                 try {
-                    // Optimize phone camera pictures down to ~300KB
                     const optimized = await prepareImageForGemini(e.target.result);
                     await callGeminiToScanStack(optimized.base64Data, optimized.mimeType);
                 } catch(err) {
@@ -1814,7 +1771,6 @@
             reader.readAsDataURL(file);
         }
 
-        // Multi-book stack API Call with Gemini + Google Books / Open Library Hybrid
         async function callGeminiToScanStack(base64Data, mimeType = "image/jpeg") {
             const statusMsg = document.getElementById("scan-status-message");
             const laser = document.getElementById("scan-laser-line");
@@ -1822,7 +1778,6 @@
             const apiKey = (localStorage.getItem('myown_gemini_api_key') || localStorage.getItem('deetya_gemini_api_key') || "").trim();
             const selectedModel = getSelectedGeminiModel();
 
-            // Fallback to simulated Demo Scan if no API key is set
             if (!apiKey) {
                 statusMsg.innerText = "Nemo is running in Demo Mode... Simulating scan with library covers!";
                 
@@ -1977,7 +1932,6 @@
             console.error("Scanning Error Details:", lastError);
         }
 
-        // Render checklist UI for Scanned Stack
         function displayScannedResults(books) {
             document.getElementById("scan-status-wrapper").classList.add("hidden");
             document.getElementById("scan-laser-line").classList.add("hidden");
@@ -2019,7 +1973,6 @@
             resultsWrap.classList.remove("hidden");
         }
 
-        // Put verified scanned checklist on the actual shelves
         function addAllVerifiedScannedBooks() {
             let addedCount = 0;
             let duplicateCount = 0;
@@ -2080,7 +2033,6 @@
             closeScannerModal();
         }
 
-        // Process logs with Gemini + Google Books / Open Library Hybrid
         async function parseExtractedTextWithAI(rawText) {
             const selectedModel = getSelectedGeminiModel();
             toggleImportLoader(true, `Nemo is extracting book names with ${selectedModel}...`);
@@ -2314,9 +2266,6 @@
             closeBulkImportModal();
         }
 
-        /* ------------------ End of Magic Bulk Importer ------------------ */
-
-        // Confetti effect
         function triggerSpineCelebration() {
             try {
                 confetti({
@@ -2329,7 +2278,6 @@
             }
         }
 
-        // Save Manual Book Form Handler
         function saveNewBook(event) {
             event.preventDefault();
 
@@ -2399,7 +2347,6 @@
             showNemoMessage(`🌸 "Splendid! '${title}' is officially organized on your bookshelf!"`);
         }
 
-        // Interactive Slide-Up details drawer
         function openBookDrawer(bookId) {
             const book = state.books.find(b => b.id === bookId);
             if (!book) return;
@@ -2419,7 +2366,6 @@
                 spinePreview.style.backgroundColor = book.color || '#F472B6';
                 spinePreview.className = "w-14 h-24 rounded-lg flex flex-col items-center justify-between p-2 shadow-md relative overflow-hidden border border-black/10 shrink-0";
                 
-                // Clear any old inner cover images
                 const existingCoverImg = spinePreview.querySelector('.drawer-spine-cover');
                 if (existingCoverImg) existingCoverImg.remove();
 
