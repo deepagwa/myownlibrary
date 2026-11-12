@@ -1,4 +1,4 @@
-const CACHE_NAME = 'myownlibrary-v8';
+const CACHE_NAME = 'myownlibrary-v10';
 const ASSETS_TO_CACHE = [
   './manifest.json',
   './icon.svg'
